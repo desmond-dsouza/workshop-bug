@@ -1,0 +1,7 @@
+- use Gizra or Skinney package: keyboard event
+- narrow the exposed API across modules as much as possible
+- add UNLOADED state before 1st random food
+- see Keyboard.Extra (and other Extra packages List, Random)
+- make testable in REPL i.e. isolate IO types like Cmd, Keyboard, etc.
+- Grid.cellSize has no visible effect
+- Decouple animation smoothness from cellSize / track-size
