@@ -1,29 +1,30 @@
 module Food exposing (..)
 
 -- module Food exposing (randomFoodCmd, view, repositionFood)
+-- Shape, circle, collage, darkGreen, darkRed, filled, move, oval)
 
-import GraphicSVG exposing (Shape, circle, collage, darkGreen, filled, move)
+import GraphicSVG exposing (..)
 import Grid exposing (grid)
 import Lib.App as App
 import Random
-import Types exposing (..)
+import Types
 
 
-randomFoodCmd : Cmd Msg
+randomFoodCmd : Cmd Types.Msg
 randomFoodCmd =
-    randomPosition NewFood
+    randomPosition Types.NewFood
 
 
-repositionFood : Bool -> Cmd Msg
+repositionFood : Bool -> Cmd Types.Msg
 repositionFood snakeAteFood =
     if snakeAteFood then
-        randomPosition NewFood
+        randomPosition Types.NewFood
 
     else
         Cmd.none
 
 
-randomPosition : (Position -> msg) -> Cmd msg
+randomPosition : (Types.Position -> msg) -> Cmd msg
 randomPosition msg =
     Random.pair
         (Random.int -(grid.numColumns // 2) (grid.numColumns // 2))
@@ -31,11 +32,19 @@ randomPosition msg =
         |> Random.generate msg
 
 
-view : Position -> List (Shape msg)
+view : Types.Food -> List (Shape msg)
 view ( i, j ) =
-    [ circle (grid.cellSize / 2)
-        |> filled darkGreen
+    [ group (apple grid.cellSize)
         |> move ( toFloat i * grid.cellSize, toFloat j * grid.cellSize )
+    ]
+
+
+apple : Float -> List (Shape msg)
+apple size =
+    [ line ( -0.1 * size, 0.2 * size ) ( 0.2 * size, 0.8 * size )
+        |> outlined (solid (size * 0.1)) darkGreen
+    , oval (size * 0.6) size |> filled darkRed |> move ( -size * 0.2, 0 )
+    , oval (size * 0.6) size |> filled darkRed |> move ( size * 0.2, 0 )
     ]
 
 
