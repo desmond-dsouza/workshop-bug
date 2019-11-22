@@ -1,10 +1,5 @@
 module Main exposing (main)
 
--- import Html exposing (Html, div, h1, p)
--- import Browser
--- import Svg exposing (svg)
--- import Svg.Attributes exposing (class, fill, fontSize, fontWeight, height, textAnchor, viewBox, width, x, y)
-
 import Food
 import GraphicSVG exposing (Shape, blue, collage, filled, move, red, size, text)
 import Grid
@@ -112,11 +107,12 @@ update msg model =
                     ( model, Cmd.none )
 
                 _ ->
+                    let
+                        snake =
+                            model.snake
+                    in
                     ( { model
-                        | snake =
-                            Snake.updateSnakeDirection
-                                model.snake
-                                (Types.arrowToDirection key)
+                        | snake = { snake | direction = Snake.nextDirection snake.direction key }
                       }
                     , Cmd.none
                     )

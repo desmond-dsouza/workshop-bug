@@ -1,8 +1,4 @@
-module Snake exposing (renderSnake, stepSnake, updateSnakeDirection)
-
--- import Html exposing (Html)
--- import Svg exposing (circle, rect)
--- import Svg.Attributes exposing (cx, cy, fill, height, r, stroke, strokeWidth, transform, width, x, y)
+module Snake exposing (nextDirection, renderSnake, stepSnake)
 
 import Debug
 import GraphicSVG exposing (..)
@@ -14,7 +10,7 @@ import Types exposing (Direction(..), Food, Position, Snake, SnakeState(..))
 
 renderSnake : Snake -> List (Shape msg)
 renderSnake snake =
-    List.map renderSnakePart snake.body ++ renderSnakeHead snake
+    List.map renderSnakeSegment snake.body ++ renderSnakeHead snake
 
 
 renderSnakeHead : Snake -> List (Shape msg)
@@ -72,8 +68,8 @@ renderSnakeHead snake =
     [ head, eyeLeft, eyeRight ]
 
 
-renderSnakePart : Position -> Shape msg
-renderSnakePart ( posX, posY ) =
+renderSnakeSegment : Position -> Shape msg
+renderSnakeSegment ( posX, posY ) =
     rect grid.cellSize grid.cellSize |> filled black |> move ( grid.cellSize * toFloat posX, grid.cellSize * toFloat posY )
 
 
@@ -82,20 +78,31 @@ invalidTransitions =
     [ ( Left, Right ), ( Right, Left ), ( Up, Down ), ( Down, Up ) ]
 
 
-updateSnakeDirection : Snake -> Maybe Direction -> Snake
-updateSnakeDirection snake direction =
-    direction
-        |> Maybe.map (validateNewDirection snake)
-        |> Maybe.withDefault snake
+nextDirection : Direction -> Maybe Key -> Direction
+nextDirection oldDir key =
+    let
+        newDir =
+            case key of
+                Just ArrowRight ->
+                    Right
 
+                Just ArrowLeft ->
+                    Left
 
-validateNewDirection : Snake -> Direction -> Snake
-validateNewDirection snake direction =
-    if List.member ( snake.direction, direction ) invalidTransitions then
-        snake
+                Just ArrowUp ->
+                    Up
+
+                Just ArrowDown ->
+                    Down
+
+                _ ->
+                    oldDir
+    in
+    if List.member ( oldDir, newDir ) invalidTransitions then
+        oldDir
 
     else
-        { snake | direction = direction }
+        newDir
 
 
 stepSnake : Snake -> Food -> Snake

@@ -21,9 +21,12 @@ walls =
     }
 
 
-viewCoordinates : Grid -> List (Shape msg)
-viewCoordinates { numColumns, numRows, cellSize } =
+viewCoordinates : List (Shape msg)
+viewCoordinates =
     let
+        { numColumns, numRows, cellSize } =
+            grid
+
         ( i0, j0 ) =
             ( -numColumns // 2, -numRows // 2 )
 
@@ -43,7 +46,7 @@ view =
                 (grid.cellSize * toFloat (grid.numRows + 1))
                 |> outlined (solid 2) black
            )
-        :: viewCoordinates grid
+        :: viewCoordinates
 
 
 viewport =

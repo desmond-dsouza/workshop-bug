@@ -49,22 +49,3 @@ type SnakeState
     | Eating
     | HitSelf
     | HitWall
-
-
-arrowToDirection : Maybe Key -> Maybe Direction
-arrowToDirection key =
-    case key of
-        Just ArrowRight ->
-            Just Right
-
-        Just ArrowLeft ->
-            Just Left
-
-        Just ArrowUp ->
-            Just Up
-
-        Just ArrowDown ->
-            Just Down
-
-        _ ->
-            Nothing
