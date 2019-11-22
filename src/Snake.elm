@@ -101,100 +101,69 @@ validateNewDirection snake direction =
 stepSnake : Snake -> Food -> Snake
 stepSnake snake food =
     let
-        snakeResetEating =
-            { snake
-                | state =
-                    case snake.state of
-                        Eating ->
-                            Normal
+        nextHead =
+            let
+                ( i, j ) =
+                    snake.head
+            in
+            case snake.direction of
+                Up ->
+                    ( i, j + 1 )
 
-                        _ ->
-                            snake.state
-            }
+                Right ->
+                    ( i + 1, j )
 
-        newHead =
-            updateHeadForWrapAround snakeResetEating
+                Down ->
+                    ( i, j - 1 )
 
-        snakeAteFood =
-            newHead == food
+                Left ->
+                    ( i - 1, j )
 
-        newSnake =
-            moveSnake newHead snakeAteFood snakeResetEating
+        gotFood =
+            nextHead == food
+
+        nextBody =
+            snake.head
+                :: (case gotFood of
+                        True ->
+                            snake.body
+
+                        False ->
+                            removeLast snake.body
+                   )
+
+        hitSelf =
+            List.member nextHead nextBody
+
+        hitWall =
+            let
+                ( i, j ) =
+                    nextHead
+
+                walls =
+                    Grid.walls
+            in
+            i < walls.left || i > walls.right || j < walls.bottom || j > walls.top
+
+        nextState =
+            if hitSelf then
+                HitSelf
+
+            else if hitWall then
+                HitWall
+
+            else if gotFood then
+                Eating
+
+            else
+                Normal
     in
-    newSnake
-
-
-moveSnake : Position -> Bool -> Snake -> Snake
-moveSnake newHead snakeAteFood snake =
-    let
-        newSnake =
-            { snake
-                | head = newHead
-                , body = updateBody snakeAteFood snake
-            }
-    in
-    if didHitSelf newSnake then
-        { newSnake | state = Types.HitSelf }
-
-    else if didHitWall newSnake then
-        { newSnake | state = Types.HitWall }
-
-    else if snakeAteFood then
-        { newSnake | state = Types.Eating }
-
-    else
-        newSnake
-
-
-updateHeadForWrapAround : Snake -> Position
-updateHeadForWrapAround { head, direction } =
-    let
-        ( i, j ) =
-            head
-    in
-    case direction of
-        Up ->
-            ( i, j + 1 )
-
-        Right ->
-            ( i + 1, j )
-
-        Down ->
-            ( i, j - 1 )
-
-        Left ->
-            ( i - 1, j )
-
-
-updateBody : Bool -> Snake -> List Position
-updateBody snakeAteFood { head, body } =
-    if snakeAteFood then
-        head :: body
-
-    else
-        head :: removeLast body
+    { snake | head = nextHead, body = nextBody, state = nextState }
 
 
 removeLast : List a -> List a
 removeLast list =
     List.take (List.length list - 1) list
-
-
-didHitSelf : Snake -> Bool
-didHitSelf snake =
-    List.member snake.head snake.body
-
-
-didHitWall : Snake -> Bool
-didHitWall snake =
-    let
-        ( i, j ) =
-            snake.head
-
-        walls =
-            Grid.walls
-    in
-    i < walls.left || i > walls.right || j < walls.bottom || j > walls.top
 
 
 main =

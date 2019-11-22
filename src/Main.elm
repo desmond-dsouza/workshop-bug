@@ -19,7 +19,11 @@ main : GraphicSVG.App () Model Msg
 main =
     GraphicSVG.app
         { init = \_ _ _ -> init
-        , view = \m -> { title = "SNEK", body = collage 800 800 (view m) } -- Grid.viewport (view m) }
+        , view =
+            \m ->
+                { title = "SNEK"
+                , body = collage 800 800 (view m) -- Grid.viewport (view m) }
+                }
         , update = update
         , subscriptions = subscriptions
         , onUrlChange = \_ -> NoOp
