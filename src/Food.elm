@@ -1,6 +1,6 @@
 module Food exposing (..)
 
--- module Food exposing (randomFoodCmd, renderFood, repositionFood)
+-- module Food exposing (randomFoodCmd, view, repositionFood)
 
 import GraphicSVG exposing (Shape, circle, collage, darkGreen, filled, move)
 import Grid exposing (grid)
@@ -31,8 +31,8 @@ randomPosition msg =
         |> Random.generate msg
 
 
-renderFood : Position -> List (Shape msg)
-renderFood ( i, j ) =
+view : Position -> List (Shape msg)
+view ( i, j ) =
     [ circle (grid.cellSize / 2)
         |> filled darkGreen
         |> move ( toFloat i * grid.cellSize, toFloat j * grid.cellSize )
@@ -43,5 +43,5 @@ main =
     App.graphicsApp
         { view =
             Grid.viewport
-                (Grid.view ++ renderFood ( 5, 5 ))
+                (Grid.view ++ view ( 5, 5 ))
         }

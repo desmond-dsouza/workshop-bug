@@ -32,7 +32,7 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Food.randomFoodCmd )
+    ( initialModel, Cmd.none )
 
 
 initialModel : Model
@@ -58,10 +58,10 @@ initialModel =
 view : Model -> List (Shape Msg)
 view model =
     Grid.view
-        ++ Snake.renderSnake model.snake
-        ++ Food.renderFood model.food
+        ++ Snake.view model.snake
+        ++ Food.view model.food
         ++ (if isGameOver model then
-                renderGameOver
+                viewGameOver
 
             else
                 []
@@ -73,8 +73,8 @@ isGameOver g =
     g.snake.state == Types.HitSelf || g.snake.state == Types.HitWall
 
 
-renderGameOver : List (Shape Msg)
-renderGameOver =
+viewGameOver : List (Shape Msg)
+viewGameOver =
     [ text "GAME OVER" |> size 24 |> filled red ]
 
 

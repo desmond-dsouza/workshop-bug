@@ -12713,193 +12713,7 @@ var $author$project$Main$initialModel = {
 		state: $author$project$Types$Normal
 	}
 };
-var $author$project$Types$NewFood = function (a) {
-	return {$: 'NewFood', a: a};
-};
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
-var $elm$random$Random$Seed = F2(
-	function (a, b) {
-		return {$: 'Seed', a: a, b: b};
-	});
-var $elm$random$Random$next = function (_v0) {
-	var state0 = _v0.a;
-	var incr = _v0.b;
-	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
-};
-var $elm$random$Random$initialSeed = function (x) {
-	var _v0 = $elm$random$Random$next(
-		A2($elm$random$Random$Seed, 0, 1013904223));
-	var state1 = _v0.a;
-	var incr = _v0.b;
-	var state2 = (state1 + x) >>> 0;
-	return $elm$random$Random$next(
-		A2($elm$random$Random$Seed, state2, incr));
-};
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$posixToMillis = function (_v0) {
-	var millis = _v0.a;
-	return millis;
-};
-var $elm$random$Random$init = A2(
-	$elm$core$Task$andThen,
-	function (time) {
-		return $elm$core$Task$succeed(
-			$elm$random$Random$initialSeed(
-				$elm$time$Time$posixToMillis(time)));
-	},
-	$elm$time$Time$now);
-var $elm$random$Random$step = F2(
-	function (_v0, seed) {
-		var generator = _v0.a;
-		return generator(seed);
-	});
-var $elm$random$Random$onEffects = F3(
-	function (router, commands, seed) {
-		if (!commands.b) {
-			return $elm$core$Task$succeed(seed);
-		} else {
-			var generator = commands.a.a;
-			var rest = commands.b;
-			var _v1 = A2($elm$random$Random$step, generator, seed);
-			var value = _v1.a;
-			var newSeed = _v1.b;
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$random$Random$onEffects, router, rest, newSeed);
-				},
-				A2($elm$core$Platform$sendToApp, router, value));
-		}
-	});
-var $elm$random$Random$onSelfMsg = F3(
-	function (_v0, _v1, seed) {
-		return $elm$core$Task$succeed(seed);
-	});
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
-var $elm$random$Random$map = F2(
-	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
-	});
-var $elm$random$Random$cmdMap = F2(
-	function (func, _v0) {
-		var generator = _v0.a;
-		return $elm$random$Random$Generate(
-			A2($elm$random$Random$map, func, generator));
-	});
-_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
-var $elm$random$Random$command = _Platform_leaf('Random');
-var $elm$random$Random$generate = F2(
-	function (tagger, generator) {
-		return $elm$random$Random$command(
-			$elm$random$Random$Generate(
-				A2($elm$random$Random$map, tagger, generator)));
-	});
-var $author$project$Grid$grid = {cellSize: 20, numColumns: 26, numRows: 26};
-var $elm$core$Bitwise$xor = _Bitwise_xor;
-var $elm$random$Random$peel = function (_v0) {
-	var state = _v0.a;
-	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
-	return ((word >>> 22) ^ word) >>> 0;
-};
-var $elm$random$Random$int = F2(
-	function (a, b) {
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
-				var lo = _v0.a;
-				var hi = _v0.b;
-				var range = (hi - lo) + 1;
-				if (!((range - 1) & range)) {
-					return _Utils_Tuple2(
-						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
-						$elm$random$Random$next(seed0));
-				} else {
-					var threshhold = (((-range) >>> 0) % range) >>> 0;
-					var accountForBias = function (seed) {
-						accountForBias:
-						while (true) {
-							var x = $elm$random$Random$peel(seed);
-							var seedN = $elm$random$Random$next(seed);
-							if (_Utils_cmp(x, threshhold) < 0) {
-								var $temp$seed = seedN;
-								seed = $temp$seed;
-								continue accountForBias;
-							} else {
-								return _Utils_Tuple2((x % range) + lo, seedN);
-							}
-						}
-					};
-					return accountForBias(seed0);
-				}
-			});
-	});
-var $elm$random$Random$map2 = F3(
-	function (func, _v0, _v1) {
-		var genA = _v0.a;
-		var genB = _v1.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v2 = genA(seed0);
-				var a = _v2.a;
-				var seed1 = _v2.b;
-				var _v3 = genB(seed1);
-				var b = _v3.a;
-				var seed2 = _v3.b;
-				return _Utils_Tuple2(
-					A2(func, a, b),
-					seed2);
-			});
-	});
-var $elm$random$Random$pair = F2(
-	function (genA, genB) {
-		return A3(
-			$elm$random$Random$map2,
-			F2(
-				function (a, b) {
-					return _Utils_Tuple2(a, b);
-				}),
-			genA,
-			genB);
-	});
-var $author$project$Food$randomPosition = function (msg) {
-	return A2(
-		$elm$random$Random$generate,
-		msg,
-		A2(
-			$elm$random$Random$pair,
-			A2($elm$random$Random$int, -(($author$project$Grid$grid.numColumns / 2) | 0), ($author$project$Grid$grid.numColumns / 2) | 0),
-			A2($elm$random$Random$int, -(($author$project$Grid$grid.numRows / 2) | 0), ($author$project$Grid$grid.numRows / 2) | 0)));
-};
-var $author$project$Food$randomFoodCmd = $author$project$Food$randomPosition($author$project$Types$NewFood);
-var $author$project$Main$init = _Utils_Tuple2($author$project$Main$initialModel, $author$project$Food$randomFoodCmd);
+var $author$project$Main$init = _Utils_Tuple2($author$project$Main$initialModel, $elm$core$Platform$Cmd$none);
 var $author$project$Types$KeyDown = function (a) {
 	return {$: 'KeyDown', a: a};
 };
@@ -12950,6 +12764,17 @@ var $elm$time$Time$addMySub = F2(
 				state);
 		}
 	});
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
 var $elm$time$Time$setInterval = _Time_setInterval;
 var $elm$core$Process$spawn = _Scheduler_spawn;
 var $elm$time$Time$spawnHelp = F3(
@@ -13040,6 +12865,11 @@ var $elm$time$Time$onEffects = F3(
 				},
 				killTask));
 	});
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
 		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
@@ -13539,6 +13369,176 @@ var $author$project$Snake$nextDirection = F2(
 			_Utils_Tuple2(oldDir, newDir),
 			$author$project$Snake$invalidTransitions) ? oldDir : newDir;
 	});
+var $author$project$Types$NewFood = function (a) {
+	return {$: 'NewFood', a: a};
+};
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $author$project$Grid$grid = {cellSize: 20, numColumns: 26, numRows: 26};
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $elm$random$Random$map2 = F3(
+	function (func, _v0, _v1) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v2 = genA(seed0);
+				var a = _v2.a;
+				var seed1 = _v2.b;
+				var _v3 = genB(seed1);
+				var b = _v3.a;
+				var seed2 = _v3.b;
+				return _Utils_Tuple2(
+					A2(func, a, b),
+					seed2);
+			});
+	});
+var $elm$random$Random$pair = F2(
+	function (genA, genB) {
+		return A3(
+			$elm$random$Random$map2,
+			F2(
+				function (a, b) {
+					return _Utils_Tuple2(a, b);
+				}),
+			genA,
+			genB);
+	});
+var $author$project$Food$randomPosition = function (msg) {
+	return A2(
+		$elm$random$Random$generate,
+		msg,
+		A2(
+			$elm$random$Random$pair,
+			A2($elm$random$Random$int, -(($author$project$Grid$grid.numColumns / 2) | 0), ($author$project$Grid$grid.numColumns / 2) | 0),
+			A2($elm$random$Random$int, -(($author$project$Grid$grid.numRows / 2) | 0), ($author$project$Grid$grid.numRows / 2) | 0)));
+};
+var $author$project$Food$randomFoodCmd = $author$project$Food$randomPosition($author$project$Types$NewFood);
 var $author$project$Types$Eating = {$: 'Eating'};
 var $author$project$Food$repositionFood = function (snakeAteFood) {
 	return snakeAteFood ? $author$project$Food$randomPosition($author$project$Types$NewFood) : $elm$core$Platform$Cmd$none;
@@ -13791,7 +13791,7 @@ var $MacCASOutreach$graphicsvg$GraphicSVG$circle = function (r) {
 	return $MacCASOutreach$graphicsvg$GraphicSVG$Circle(r);
 };
 var $MacCASOutreach$graphicsvg$GraphicSVG$darkGreen = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 78, 154, 6, 1);
-var $author$project$Food$renderFood = function (_v0) {
+var $author$project$Food$view = function (_v0) {
 	var i = _v0.a;
 	var j = _v0.b;
 	return _List_fromArray(
@@ -13805,55 +13805,99 @@ var $author$project$Food$renderFood = function (_v0) {
 				$MacCASOutreach$graphicsvg$GraphicSVG$circle($author$project$Grid$grid.cellSize / 2)))
 		]);
 };
-var $MacCASOutreach$graphicsvg$GraphicSVG$red = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 204, 0, 0, 1);
+var $MacCASOutreach$graphicsvg$GraphicSVG$graphPaper = function (s) {
+	return A3(
+		$MacCASOutreach$graphicsvg$GraphicSVG$GraphPaper,
+		s,
+		1,
+		A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 135, 206, 250, 1));
+};
+var $MacCASOutreach$graphicsvg$GraphicSVG$outlined = F3(
+	function (style, outlineClr, stencil) {
+		var lineStyle = function () {
+			if (style.$ === 'NoLine') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				return $elm$core$Maybe$Just(
+					_Utils_Tuple2(style, outlineClr));
+			}
+		}();
+		return A3($MacCASOutreach$graphicsvg$GraphicSVG$Inked, $elm$core$Maybe$Nothing, lineStyle, stencil);
+	});
+var $MacCASOutreach$graphicsvg$GraphicSVG$Solid = function (a) {
+	return {$: 'Solid', a: a};
+};
+var $MacCASOutreach$graphicsvg$GraphicSVG$solid = function (th) {
+	return $MacCASOutreach$graphicsvg$GraphicSVG$Solid(th);
+};
+var $MacCASOutreach$graphicsvg$GraphicSVG$AlignLeft = {$: 'AlignLeft'};
 var $MacCASOutreach$graphicsvg$GraphicSVG$Face = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {$: 'Face', a: a, b: b, c: c, d: d, e: e, f: f, g: g, h: h};
 	});
+var $MacCASOutreach$graphicsvg$GraphicSVG$Serif = {$: 'Serif'};
 var $MacCASOutreach$graphicsvg$GraphicSVG$Text = F2(
 	function (a, b) {
 		return {$: 'Text', a: a, b: b};
 	});
-var $MacCASOutreach$graphicsvg$GraphicSVG$size = F2(
-	function (sze, stencil) {
-		if (stencil.$ === 'Text') {
-			var _v1 = stencil.a;
-			var si = _v1.a;
-			var bo = _v1.b;
-			var i = _v1.c;
-			var u = _v1.d;
-			var s = _v1.e;
-			var sel = _v1.f;
-			var f = _v1.g;
-			var c = _v1.h;
-			var str = stencil.b;
-			return A2(
-				$MacCASOutreach$graphicsvg$GraphicSVG$Text,
-				A8($MacCASOutreach$graphicsvg$GraphicSVG$Face, sze, bo, i, u, s, sel, f, c),
-				str);
-		} else {
-			var a = stencil;
-			return a;
-		}
-	});
-var $MacCASOutreach$graphicsvg$GraphicSVG$AlignLeft = {$: 'AlignLeft'};
-var $MacCASOutreach$graphicsvg$GraphicSVG$Serif = {$: 'Serif'};
 var $MacCASOutreach$graphicsvg$GraphicSVG$text = function (str) {
 	return A2(
 		$MacCASOutreach$graphicsvg$GraphicSVG$Text,
 		A8($MacCASOutreach$graphicsvg$GraphicSVG$Face, 12, false, false, false, false, false, $MacCASOutreach$graphicsvg$GraphicSVG$Serif, $MacCASOutreach$graphicsvg$GraphicSVG$AlignLeft),
 		str);
 };
-var $author$project$Main$renderGameOver = _List_fromArray(
-	[
-		A2(
-		$MacCASOutreach$graphicsvg$GraphicSVG$filled,
-		$MacCASOutreach$graphicsvg$GraphicSVG$red,
-		A2(
-			$MacCASOutreach$graphicsvg$GraphicSVG$size,
-			24,
-			$MacCASOutreach$graphicsvg$GraphicSVG$text('GAME OVER')))
-	]);
+var $elm$core$Debug$toString = _Debug_toString;
+var $author$project$Grid$viewCoordinates = function () {
+	var _v0 = $author$project$Grid$grid;
+	var numColumns = _v0.numColumns;
+	var numRows = _v0.numRows;
+	var cellSize = _v0.cellSize;
+	var _v1 = _Utils_Tuple2(((-numColumns) / 2) | 0, ((-numRows) / 2) | 0);
+	var i0 = _v1.a;
+	var j0 = _v1.b;
+	var _v2 = _Utils_Tuple2((numColumns / 2) | 0, (numRows / 2) | 0);
+	var i1 = _v2.a;
+	var j1 = _v2.b;
+	return _List_fromArray(
+		[
+			A2(
+			$MacCASOutreach$graphicsvg$GraphicSVG$move,
+			_Utils_Tuple2(0, 0),
+			A2(
+				$MacCASOutreach$graphicsvg$GraphicSVG$filled,
+				$MacCASOutreach$graphicsvg$GraphicSVG$black,
+				$MacCASOutreach$graphicsvg$GraphicSVG$text('(0,0)'))),
+			A2(
+			$MacCASOutreach$graphicsvg$GraphicSVG$move,
+			_Utils_Tuple2(cellSize * i0, cellSize * j0),
+			A2(
+				$MacCASOutreach$graphicsvg$GraphicSVG$filled,
+				$MacCASOutreach$graphicsvg$GraphicSVG$black,
+				$MacCASOutreach$graphicsvg$GraphicSVG$text(
+					$elm$core$Debug$toString(
+						_Utils_Tuple2(i0, j0))))),
+			A2(
+			$MacCASOutreach$graphicsvg$GraphicSVG$move,
+			_Utils_Tuple2(cellSize * i1, cellSize * j1),
+			A2(
+				$MacCASOutreach$graphicsvg$GraphicSVG$filled,
+				$MacCASOutreach$graphicsvg$GraphicSVG$black,
+				$MacCASOutreach$graphicsvg$GraphicSVG$text(
+					$elm$core$Debug$toString(
+						_Utils_Tuple2(i1, j1)))))
+		]);
+}();
+var $author$project$Grid$view = A2(
+	$elm$core$List$cons,
+	$MacCASOutreach$graphicsvg$GraphicSVG$graphPaper($author$project$Grid$grid.cellSize),
+	A2(
+		$elm$core$List$cons,
+		A3(
+			$MacCASOutreach$graphicsvg$GraphicSVG$outlined,
+			$MacCASOutreach$graphicsvg$GraphicSVG$solid(2),
+			$MacCASOutreach$graphicsvg$GraphicSVG$black,
+			A2($MacCASOutreach$graphicsvg$GraphicSVG$rect, $author$project$Grid$grid.cellSize * ($author$project$Grid$grid.numColumns + 1), $author$project$Grid$grid.cellSize * ($author$project$Grid$grid.numRows + 1))),
+		$author$project$Grid$viewCoordinates));
 var $MacCASOutreach$graphicsvg$GraphicSVG$blue = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 52, 101, 164, 1);
 var $MacCASOutreach$graphicsvg$GraphicSVG$brown = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 193, 125, 17, 1);
 var $elm$core$Basics$pi = _Basics_pi;
@@ -13862,11 +13906,12 @@ var $elm$core$Basics$degrees = function (angleInDegrees) {
 };
 var $MacCASOutreach$graphicsvg$GraphicSVG$pink = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 255, 105, 180, 1);
 var $MacCASOutreach$graphicsvg$GraphicSVG$purple = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 117, 80, 123, 1);
+var $MacCASOutreach$graphicsvg$GraphicSVG$red = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 204, 0, 0, 1);
 var $MacCASOutreach$graphicsvg$GraphicSVG$rotate = F2(
 	function (theta, shape) {
 		return A2($MacCASOutreach$graphicsvg$GraphicSVG$Rotate, theta, shape);
 	});
-var $author$project$Snake$renderSnakeHead = function (snake) {
+var $author$project$Snake$viewSnakeHead = function (snake) {
 	var rotation = $elm$core$Basics$degrees(
 		function () {
 			var _v3 = snake.direction;
@@ -13936,7 +13981,7 @@ var $author$project$Snake$renderSnakeHead = function (snake) {
 	return _List_fromArray(
 		[head, eyeLeft, eyeRight]);
 };
-var $author$project$Snake$renderSnakeSegment = function (_v0) {
+var $author$project$Snake$viewSnakeSegment = function (_v0) {
 	var posX = _v0.a;
 	var posY = _v0.b;
 	return A2(
@@ -13947,96 +13992,51 @@ var $author$project$Snake$renderSnakeSegment = function (_v0) {
 			$MacCASOutreach$graphicsvg$GraphicSVG$black,
 			A2($MacCASOutreach$graphicsvg$GraphicSVG$rect, $author$project$Grid$grid.cellSize, $author$project$Grid$grid.cellSize)));
 };
-var $author$project$Snake$renderSnake = function (snake) {
+var $author$project$Snake$view = function (snake) {
 	return _Utils_ap(
-		A2($elm$core$List$map, $author$project$Snake$renderSnakeSegment, snake.body),
-		$author$project$Snake$renderSnakeHead(snake));
+		A2($elm$core$List$map, $author$project$Snake$viewSnakeSegment, snake.body),
+		$author$project$Snake$viewSnakeHead(snake));
 };
-var $MacCASOutreach$graphicsvg$GraphicSVG$graphPaper = function (s) {
-	return A3(
-		$MacCASOutreach$graphicsvg$GraphicSVG$GraphPaper,
-		s,
-		1,
-		A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 135, 206, 250, 1));
-};
-var $MacCASOutreach$graphicsvg$GraphicSVG$outlined = F3(
-	function (style, outlineClr, stencil) {
-		var lineStyle = function () {
-			if (style.$ === 'NoLine') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				return $elm$core$Maybe$Just(
-					_Utils_Tuple2(style, outlineClr));
-			}
-		}();
-		return A3($MacCASOutreach$graphicsvg$GraphicSVG$Inked, $elm$core$Maybe$Nothing, lineStyle, stencil);
+var $MacCASOutreach$graphicsvg$GraphicSVG$size = F2(
+	function (sze, stencil) {
+		if (stencil.$ === 'Text') {
+			var _v1 = stencil.a;
+			var si = _v1.a;
+			var bo = _v1.b;
+			var i = _v1.c;
+			var u = _v1.d;
+			var s = _v1.e;
+			var sel = _v1.f;
+			var f = _v1.g;
+			var c = _v1.h;
+			var str = stencil.b;
+			return A2(
+				$MacCASOutreach$graphicsvg$GraphicSVG$Text,
+				A8($MacCASOutreach$graphicsvg$GraphicSVG$Face, sze, bo, i, u, s, sel, f, c),
+				str);
+		} else {
+			var a = stencil;
+			return a;
+		}
 	});
-var $MacCASOutreach$graphicsvg$GraphicSVG$Solid = function (a) {
-	return {$: 'Solid', a: a};
-};
-var $MacCASOutreach$graphicsvg$GraphicSVG$solid = function (th) {
-	return $MacCASOutreach$graphicsvg$GraphicSVG$Solid(th);
-};
-var $elm$core$Debug$toString = _Debug_toString;
-var $author$project$Grid$viewCoordinates = function () {
-	var _v0 = $author$project$Grid$grid;
-	var numColumns = _v0.numColumns;
-	var numRows = _v0.numRows;
-	var cellSize = _v0.cellSize;
-	var _v1 = _Utils_Tuple2(((-numColumns) / 2) | 0, ((-numRows) / 2) | 0);
-	var i0 = _v1.a;
-	var j0 = _v1.b;
-	var _v2 = _Utils_Tuple2((numColumns / 2) | 0, (numRows / 2) | 0);
-	var i1 = _v2.a;
-	var j1 = _v2.b;
-	return _List_fromArray(
-		[
-			A2(
-			$MacCASOutreach$graphicsvg$GraphicSVG$move,
-			_Utils_Tuple2(0, 0),
-			A2(
-				$MacCASOutreach$graphicsvg$GraphicSVG$filled,
-				$MacCASOutreach$graphicsvg$GraphicSVG$black,
-				$MacCASOutreach$graphicsvg$GraphicSVG$text('(0,0)'))),
-			A2(
-			$MacCASOutreach$graphicsvg$GraphicSVG$move,
-			_Utils_Tuple2(cellSize * i0, cellSize * j0),
-			A2(
-				$MacCASOutreach$graphicsvg$GraphicSVG$filled,
-				$MacCASOutreach$graphicsvg$GraphicSVG$black,
-				$MacCASOutreach$graphicsvg$GraphicSVG$text(
-					$elm$core$Debug$toString(
-						_Utils_Tuple2(i0, j0))))),
-			A2(
-			$MacCASOutreach$graphicsvg$GraphicSVG$move,
-			_Utils_Tuple2(cellSize * i1, cellSize * j1),
-			A2(
-				$MacCASOutreach$graphicsvg$GraphicSVG$filled,
-				$MacCASOutreach$graphicsvg$GraphicSVG$black,
-				$MacCASOutreach$graphicsvg$GraphicSVG$text(
-					$elm$core$Debug$toString(
-						_Utils_Tuple2(i1, j1)))))
-		]);
-}();
-var $author$project$Grid$view = A2(
-	$elm$core$List$cons,
-	$MacCASOutreach$graphicsvg$GraphicSVG$graphPaper($author$project$Grid$grid.cellSize),
-	A2(
-		$elm$core$List$cons,
-		A3(
-			$MacCASOutreach$graphicsvg$GraphicSVG$outlined,
-			$MacCASOutreach$graphicsvg$GraphicSVG$solid(2),
-			$MacCASOutreach$graphicsvg$GraphicSVG$black,
-			A2($MacCASOutreach$graphicsvg$GraphicSVG$rect, $author$project$Grid$grid.cellSize * ($author$project$Grid$grid.numColumns + 1), $author$project$Grid$grid.cellSize * ($author$project$Grid$grid.numRows + 1))),
-		$author$project$Grid$viewCoordinates));
+var $author$project$Main$viewGameOver = _List_fromArray(
+	[
+		A2(
+		$MacCASOutreach$graphicsvg$GraphicSVG$filled,
+		$MacCASOutreach$graphicsvg$GraphicSVG$red,
+		A2(
+			$MacCASOutreach$graphicsvg$GraphicSVG$size,
+			24,
+			$MacCASOutreach$graphicsvg$GraphicSVG$text('GAME OVER')))
+	]);
 var $author$project$Main$view = function (model) {
 	return _Utils_ap(
 		$author$project$Grid$view,
 		_Utils_ap(
-			$author$project$Snake$renderSnake(model.snake),
+			$author$project$Snake$view(model.snake),
 			_Utils_ap(
-				$author$project$Food$renderFood(model.food),
-				$author$project$Main$isGameOver(model) ? $author$project$Main$renderGameOver : _List_Nil)));
+				$author$project$Food$view(model.food),
+				$author$project$Main$isGameOver(model) ? $author$project$Main$viewGameOver : _List_Nil)));
 };
 var $author$project$Main$main = $MacCASOutreach$graphicsvg$GraphicSVG$app(
 	{

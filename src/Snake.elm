@@ -1,4 +1,4 @@
-module Snake exposing (nextDirection, renderSnake, stepSnake)
+module Snake exposing (nextDirection, stepSnake, view)
 
 import Debug
 import GraphicSVG exposing (..)
@@ -8,13 +8,13 @@ import Lib.App as App
 import Types exposing (Direction(..), Food, Position, Snake, SnakeState(..))
 
 
-renderSnake : Snake -> List (Shape msg)
-renderSnake snake =
-    List.map renderSnakeSegment snake.body ++ renderSnakeHead snake
+view : Snake -> List (Shape msg)
+view snake =
+    List.map viewSnakeSegment snake.body ++ viewSnakeHead snake
 
 
-renderSnakeHead : Snake -> List (Shape msg)
-renderSnakeHead snake =
+viewSnakeHead : Snake -> List (Shape msg)
+viewSnakeHead snake =
     let
         ( i, j ) =
             snake.head
@@ -68,8 +68,8 @@ renderSnakeHead snake =
     [ head, eyeLeft, eyeRight ]
 
 
-renderSnakeSegment : Position -> Shape msg
-renderSnakeSegment ( posX, posY ) =
+viewSnakeSegment : Position -> Shape msg
+viewSnakeSegment ( posX, posY ) =
     rect grid.cellSize grid.cellSize |> filled black |> move ( grid.cellSize * toFloat posX, grid.cellSize * toFloat posY )
 
 
@@ -186,4 +186,4 @@ main =
             }
     in
     App.graphicsApp
-        { view = Grid.viewport (Grid.view ++ renderSnake initialSnake) }
+        { view = Grid.viewport (Grid.view ++ view initialSnake) }
