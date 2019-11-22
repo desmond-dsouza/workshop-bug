@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Food
-import GraphicSVG exposing (Shape, blue, collage, filled, move, red, size, text)
+import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)
 import Grid
 import Keyboard exposing (Key(..))
 import Lib.App as App
@@ -17,7 +17,7 @@ main =
         , view =
             \m ->
                 { title = "SNEK"
-                , body = collage 800 800 (view m) -- Grid.viewport (view m) }
+                , body = Grid.viewport (view m)
                 }
         , update = update
         , subscriptions = subscriptions
@@ -38,16 +38,13 @@ init =
 initialModel : Model
 initialModel =
     { snake =
-        { head = ( -7, 0 )
+        { head = ( -2, 0 )
         , body =
-            [ ( -8, 0 )
-            , ( -9, 0 )
-            , ( -10, 0 )
-            ]
+            [ ( -3, 0 ) ]
         , direction = Right
         , state = Normal
         }
-    , food = ( 10, 0 )
+    , food = ( Grid.grid.numColumns // 2 - 1, 0 )
     }
 
 
@@ -75,7 +72,7 @@ isGameOver g =
 
 viewGameOver : List (Shape Msg)
 viewGameOver =
-    [ text "GAME OVER" |> size 24 |> filled red ]
+    [ text "GAME OVER" |> size 24 |> centered |> filled red ]
 
 
 

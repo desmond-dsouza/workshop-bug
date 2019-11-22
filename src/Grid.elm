@@ -10,7 +10,7 @@ import Types exposing (..)
 grid : Grid
 grid =
     -- best to use even numbers for cols & rows
-    { numColumns = 26, numRows = 26, cellSize = 20 }
+    { numColumns = 14, numRows = 14, cellSize = 20 }
 
 
 walls =
@@ -41,12 +41,11 @@ viewCoordinates =
 
 view : List (Shape msg)
 view =
-    graphPaper grid.cellSize
-        :: (rect (grid.cellSize * toFloat (grid.numColumns + 1))
-                (grid.cellSize * toFloat (grid.numRows + 1))
-                |> outlined (solid 2) black
-           )
-        :: viewCoordinates
+    [ graphPaper grid.cellSize
+    , rect (grid.cellSize * toFloat (grid.numColumns + 1))
+        (grid.cellSize * toFloat (grid.numRows + 1))
+        |> outlined (solid 2) black
+    ]
 
 
 viewport =
