@@ -1,4 +1,4 @@
-module Food exposing (..)
+module Food exposing (randomFoodCmd, view)
 
 -- module Food exposing (randomFoodCmd, view, repositionFood)
 -- Shape, circle, collage, darkGreen, darkRed, filled, move, oval)
@@ -13,15 +13,6 @@ import Types
 randomFoodCmd : Cmd Types.Msg
 randomFoodCmd =
     randomPosition Types.NewFood
-
-
-repositionFood : Bool -> Cmd Types.Msg
-repositionFood snakeAteFood =
-    if snakeAteFood then
-        randomPosition Types.NewFood
-
-    else
-        Cmd.none
 
 
 randomPosition : (Types.Position -> msg) -> Cmd msg

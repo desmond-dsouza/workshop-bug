@@ -125,13 +125,11 @@ step model =
             Snake.stepSnake model.snake model.food
     in
     ( { model | snake = newSnake }
-    , Food.repositionFood
-        (if newSnake.state == Eating then
-            True
+    , if newSnake.state == Eating then
+        Food.randomFoodCmd
 
-         else
-            False
-        )
+      else
+        Cmd.none
     )
 
 
