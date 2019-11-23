@@ -5,7 +5,7 @@ import GraphicSVG exposing (..)
 import Grid exposing (grid)
 import Keyboard exposing (Key(..))
 import Lib.App as App
-import Types exposing (Direction(..), Food, Position, Snake, SnakeState(..))
+import Types exposing (Body, Direction(..), Food, Head, Position, Segment, Snake, SnakeState(..), Walls)
 
 
 view : Snake -> List (Shape msg)
@@ -68,7 +68,7 @@ viewSnakeHead snake =
     [ head, eyeLeft, eyeRight ]
 
 
-viewSnakeSegment : Position -> Shape msg
+viewSnakeSegment : Segment -> Shape msg
 viewSnakeSegment ( posX, posY ) =
     rect grid.cellSize grid.cellSize |> filled black |> move ( grid.cellSize * toFloat posX, grid.cellSize * toFloat posY )
 
@@ -105,61 +105,72 @@ nextDirection oldDir key =
         newDir
 
 
+stepHead : Head -> Direction -> Head
+stepHead ( i, j ) direction =
+    case direction of
+        Up ->
+            ( i, j + 1 )
+
+        Right ->
+            ( i + 1, j )
+
+        Down ->
+            ( i, j - 1 )
+
+        Left ->
+            ( i - 1, j )
+
+
+stepBody : Head -> Bool -> Body -> Body
+stepBody currHead gotFoodNext currBody =
+    currHead
+        :: (case gotFoodNext of
+                True ->
+                    currBody
+
+                False ->
+                    removeLast currBody
+           )
+
+
+gotFood : Head -> Food -> Bool
+gotFood h f =
+    h == f
+
+
+hitSelf : Head -> Body -> Bool
+hitSelf head body =
+    List.member head body
+
+
+hitWall : Head -> Walls -> Bool
+hitWall ( i, j ) walls =
+    i < walls.left || i > walls.right || j < walls.bottom || j > walls.top
+
+
 stepSnake : Snake -> Food -> Snake
 stepSnake snake food =
     let
         nextHead =
-            let
-                ( i, j ) =
-                    snake.head
-            in
-            case snake.direction of
-                Up ->
-                    ( i, j + 1 )
+            stepHead snake.head snake.direction
 
-                Right ->
-                    ( i + 1, j )
-
-                Down ->
-                    ( i, j - 1 )
-
-                Left ->
-                    ( i - 1, j )
-
-        gotFood =
-            nextHead == food
+        nextGotFood =
+            gotFood nextHead food
 
         nextBody =
-            snake.head
-                :: (case gotFood of
-                        True ->
-                            snake.body
+            stepBody snake.head nextGotFood snake.body
 
-                        False ->
-                            removeLast snake.body
-                   )
-
-        hitSelf =
-            List.member nextHead nextBody
-
-        hitWall =
-            let
-                ( i, j ) =
-                    nextHead
-
-                walls =
-                    Grid.walls
-            in
-            i < walls.left || i > walls.right || j < walls.bottom || j > walls.top
+        nextHitWall =
+            hitWall nextHead Grid.walls
 
         nextState =
-            if hitSelf then
+            if hitSelf nextHead nextBody then
                 HitSelf
 
-            else if hitWall then
+            else if hitWall nextHead Grid.walls then
                 HitWall
 
-            else if gotFood then
+            else if nextGotFood then
                 Eating
 
             else

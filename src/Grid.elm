@@ -13,6 +13,7 @@ grid =
     { numColumns = 14, numRows = 14, cellSize = 20 }
 
 
+walls : Walls
 walls =
     { left = -grid.numColumns // 2
     , right = grid.numColumns // 2

@@ -4,14 +4,48 @@ import Keyboard exposing (Key(..))
 import Time
 
 
-type alias Food =
-    Position
-
-
 type alias Model =
     { snake : Snake
     , food : Food
     }
+
+
+type alias Snake =
+    { head : Head
+    , body : Body
+    , direction : Direction
+    , state : SnakeState
+    }
+
+
+type alias Food =
+    Position
+
+
+type alias Head =
+    Position
+
+
+type alias Body =
+    List Segment
+
+
+type alias Segment =
+    Position
+
+
+type Direction
+    = Up
+    | Down
+    | Left
+    | Right
+
+
+type SnakeState
+    = Normal
+    | Eating
+    | HitSelf
+    | HitWall
 
 
 type alias Position =
@@ -22,30 +56,12 @@ type alias Grid =
     { numRows : Int, numColumns : Int, cellSize : Float }
 
 
+type alias Walls =
+    { left : Int, right : Int, top : Int, bottom : Int }
+
+
 type Msg
     = Tick Time.Posix
     | KeyDown Keyboard.RawKey
     | NewFood Position
     | NoOp
-
-
-type Direction
-    = Up
-    | Down
-    | Left
-    | Right
-
-
-type alias Snake =
-    { head : Position
-    , body : List Position
-    , direction : Direction
-    , state : SnakeState
-    }
-
-
-type SnakeState
-    = Normal
-    | Eating
-    | HitSelf
-    | HitWall
