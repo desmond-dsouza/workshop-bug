@@ -1,6 +1,5 @@
 - FIX glitch with rapid keystrokes
 
-- use Gizra or Skinney package: keyboard event
-- add UNLOADED state before 1st random food
+- add READY state waiting for Arrow to start motion
 - make testable in REPL i.e. isolate IO types like Cmd, Keyboard, etc.
 - Decouple animation smoothness from cellSize / track-size

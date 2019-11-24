@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (..)
 
 import Food
 import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)

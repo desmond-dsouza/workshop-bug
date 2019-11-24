@@ -1,4 +1,4 @@
-module Snake exposing (nextDirection, stepSnake, view)
+module Snake exposing (..)
 
 import Debug
 import GraphicSVG exposing (..)

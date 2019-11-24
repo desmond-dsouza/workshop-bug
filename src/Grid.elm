@@ -1,4 +1,4 @@
-module Grid exposing (grid, view, viewport, walls)
+module Grid exposing (..)
 
 import Debug
 import GraphicSVG exposing (..)

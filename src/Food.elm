@@ -1,7 +1,4 @@
-module Food exposing (randomFoodCmd, view)
-
--- module Food exposing (randomFoodCmd, view, repositionFood)
--- Shape, circle, collage, darkGreen, darkRed, filled, move, oval)
+module Food exposing (..)
 
 import GraphicSVG exposing (..)
 import Grid exposing (grid)
