@@ -60,10 +60,10 @@ viewSnakeHead snake =
                 |> move ( headX0, headY0 )
 
         eyeLeft =
-            circle eyeRadius |> filled blue |> move ( 0.3 |> fracToGrid, 0.3 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
+            circle eyeRadius |> filled black |> move ( 0.25 |> fracToGrid, 0.25 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
 
         eyeRight =
-            circle eyeRadius |> filled blue |> move ( 0.3 |> fracToGrid, -0.3 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
+            circle eyeRadius |> filled black |> move ( 0.25 |> fracToGrid, -0.25 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
     in
     [ head, eyeLeft, eyeRight ]
 

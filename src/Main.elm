@@ -10,6 +10,10 @@ import Time
 import Types exposing (..)
 
 
+
+-- MAIN -------------------
+
+
 main : GraphicSVG.App () Model Msg
 main =
     GraphicSVG.app
@@ -24,6 +28,26 @@ main =
         , onUrlChange = \_ -> NoOp
         , onUrlRequest = \u -> NoOp
         }
+
+
+
+-- SUBSCRIPTIONS ----------------
+
+
+tickDelay =
+    100
+
+
+subscriptions : Model -> Sub Msg
+subscriptions m =
+    if isGameOver m then
+        Keyboard.downs KeyDown
+
+    else
+        Sub.batch
+            [ Keyboard.downs KeyDown
+            , Time.every tickDelay Tick
+            ]
 
 
 
@@ -131,23 +155,3 @@ step model =
       else
         Cmd.none
     )
-
-
-
--- SUBSCRIPTIONS ----------------
-
-
-tickDelta =
-    200
-
-
-subscriptions : Model -> Sub Msg
-subscriptions m =
-    if isGameOver m then
-        Keyboard.downs KeyDown
-
-    else
-        Sub.batch
-            [ Keyboard.downs KeyDown
-            , Time.every tickDelta Tick
-            ]
