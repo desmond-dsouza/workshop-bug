@@ -53,7 +53,7 @@ type alias Position =
 
 
 type alias Grid =
-    { numRows : Int, numColumns : Int, cellSize : Float }
+    { numRows : Int, numColumns : Int }
 
 
 type alias Walls =

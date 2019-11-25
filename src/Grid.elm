@@ -1,4 +1,4 @@
-module Grid exposing (..)
+module Grid exposing (fracToGrid, grid, toGrid, view, viewport, walls)
 
 import Debug
 import GraphicSVG exposing (..)
@@ -10,7 +10,22 @@ import Types exposing (..)
 grid : Grid
 grid =
     -- best to use even numbers for cols & rows
-    { numColumns = 14, numRows = 14, cellSize = 20 }
+    { numColumns = 14, numRows = 14 }
+
+
+cellSize : Float
+cellSize =
+    20.0
+
+
+toGrid : Int -> Float
+toGrid i =
+    cellSize * toFloat i
+
+
+fracToGrid : Float -> Float
+fracToGrid f =
+    cellSize * f
 
 
 walls : Walls
@@ -25,7 +40,7 @@ walls =
 viewCoordinates : List (Shape msg)
 viewCoordinates =
     let
-        { numColumns, numRows, cellSize } =
+        { numColumns, numRows } =
             grid
 
         ( i0, j0 ) =
@@ -35,22 +50,22 @@ viewCoordinates =
             ( numColumns // 2, numRows // 2 )
     in
     [ text "(0,0)" |> filled black |> move ( 0, 0 )
-    , text (Debug.toString ( i0, j0 )) |> filled black |> move ( cellSize * toFloat i0, cellSize * toFloat j0 )
-    , text (Debug.toString ( i1, j1 )) |> filled black |> move ( cellSize * toFloat i1, cellSize * toFloat j1 )
+    , text (Debug.toString ( i0, j0 )) |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
+    , text (Debug.toString ( i1, j1 )) |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
     ]
 
 
 view : List (Shape msg)
 view =
-    [ graphPaper grid.cellSize
-    , rect (grid.cellSize * toFloat (grid.numColumns + 1))
-        (grid.cellSize * toFloat (grid.numRows + 1))
+    [ graphPaper cellSize
+    , rect ((grid.numColumns + 1) |> toGrid)
+        ((grid.numRows + 1) |> toGrid)
         |> outlined (solid 2) black
     ]
 
 
 viewport =
-    collage (grid.cellSize * toFloat (grid.numColumns + 4)) (grid.cellSize * toFloat (grid.numRows + 4))
+    collage ((grid.numColumns + 4) |> toGrid) ((grid.numRows + 4) |> toGrid)
 
 
 main =

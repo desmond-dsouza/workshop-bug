@@ -1,7 +1,7 @@
 module Food exposing (..)
 
 import GraphicSVG exposing (..)
-import Grid exposing (grid)
+import Grid exposing (grid, toGrid)
 import Lib.App as App
 import Random
 import Types
@@ -22,18 +22,19 @@ randomPosition msg =
 
 view : Types.Food -> List (Shape msg)
 view ( i, j ) =
-    [ group (apple grid.cellSize)
-        |> move ( toFloat i * grid.cellSize, toFloat j * grid.cellSize )
+    [ apple (1 |> toGrid)
+        |> move ( i |> toGrid, j |> toGrid )
     ]
 
 
-apple : Float -> List (Shape msg)
+apple : Float -> Shape msg
 apple size =
-    [ line ( -0.1 * size, 0.2 * size ) ( 0.2 * size, 0.8 * size )
-        |> outlined (solid (size * 0.1)) darkGreen
-    , oval (size * 0.6) size |> filled darkRed |> move ( -size * 0.2, 0 )
-    , oval (size * 0.6) size |> filled darkRed |> move ( size * 0.2, 0 )
-    ]
+    group
+        [ line ( -0.1 * size, 0.2 * size ) ( 0.2 * size, 0.8 * size )
+            |> outlined (solid (size * 0.1)) darkGreen
+        , oval (size * 0.6) size |> filled darkRed |> move ( -size * 0.2, 0 )
+        , oval (size * 0.6) size |> filled darkRed |> move ( size * 0.2, 0 )
+        ]
 
 
 main =

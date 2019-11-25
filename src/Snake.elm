@@ -2,7 +2,7 @@ module Snake exposing (..)
 
 import Debug
 import GraphicSVG exposing (..)
-import Grid exposing (grid)
+import Grid exposing (fracToGrid, grid, toGrid)
 import Keyboard exposing (Key(..))
 import Lib.App as App
 import Types exposing (Body, Direction(..), Food, Head, Position, Segment, Snake, SnakeState(..), Walls)
@@ -20,10 +20,10 @@ viewSnakeHead snake =
             snake.head
 
         ( headX0, headY0 ) =
-            ( grid.cellSize * toFloat i, grid.cellSize * toFloat j )
+            ( i |> toGrid, j |> toGrid )
 
         eyeRadius =
-            grid.cellSize * 0.15
+            0.15 |> fracToGrid
 
         rotation =
             degrees
@@ -42,7 +42,7 @@ viewSnakeHead snake =
                 )
 
         head =
-            rect grid.cellSize grid.cellSize
+            rect (1 |> toGrid) (1 |> toGrid)
                 |> filled
                     (case snake.state of
                         Normal ->
@@ -60,17 +60,17 @@ viewSnakeHead snake =
                 |> move ( headX0, headY0 )
 
         eyeLeft =
-            circle eyeRadius |> filled blue |> move ( grid.cellSize * 0.3, grid.cellSize * 0.3 ) |> rotate rotation |> move ( headX0, headY0 )
+            circle eyeRadius |> filled blue |> move ( 0.3 |> fracToGrid, 0.3 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
 
         eyeRight =
-            circle eyeRadius |> filled blue |> move ( grid.cellSize * 0.3, grid.cellSize * -0.3 ) |> rotate rotation |> move ( headX0, headY0 )
+            circle eyeRadius |> filled blue |> move ( 0.3 |> fracToGrid, -0.3 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
     in
     [ head, eyeLeft, eyeRight ]
 
 
 viewSnakeSegment : Segment -> Shape msg
 viewSnakeSegment ( posX, posY ) =
-    rect grid.cellSize grid.cellSize |> filled black |> move ( grid.cellSize * toFloat posX, grid.cellSize * toFloat posY )
+    rect (1 |> toGrid) (1 |> toGrid) |> filled black |> move ( posX |> toGrid, posY |> toGrid )
 
 
 invalidTransitions : List ( Direction, Direction )
