@@ -48,10 +48,18 @@ viewCoordinates =
 
         ( i1, j1 ) =
             ( numColumns // 2, numRows // 2 )
+
+        downY =
+            -12.0
     in
-    [ text "(0,0)" |> filled black |> move ( 0, 0 )
-    , text (Debug.toString ( i0, j0 )) |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
-    , text (Debug.toString ( i1, j1 )) |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
+    [ text "Black: i-j coordinates" |> centered |> filled black |> move ( 0, 62 )
+    , text "Red: grid distances" |> centered |> filled red |> move ( 0, 42 )
+    , text "Unit cell = 10x10 (grid)" |> centered |> filled red |> move ( 0, 22 )
+    , text "(0,0)" |> centered |> filled black |> move ( 0, 0 )
+    , text (Debug.toString ( i0, j0 )) |> centered |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
+    , text (Debug.toString ( i1, j1 )) |> centered |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
+    , text (Debug.toString ( i0 |> toGrid, j0 |> toGrid )) |> centered |> filled red |> move ( i0 |> toGrid, downY + toGrid j0 )
+    , text (Debug.toString ( i1 |> toGrid, j1 |> toGrid )) |> centered |> filled red |> move ( i1 |> toGrid, downY + toGrid j1 )
     ]
 
 
@@ -60,7 +68,7 @@ view =
     [ graphPaper cellSize
     , rect ((grid.numColumns + 1) |> toGrid)
         ((grid.numRows + 1) |> toGrid)
-        |> outlined (solid 2) black
+        |> outlined (solid 3) darkGrey
     ]
 
 
@@ -70,4 +78,4 @@ viewport =
 
 main =
     App.graphicsApp
-        { view = viewport view }
+        { view = viewport (view ++ viewCoordinates) }

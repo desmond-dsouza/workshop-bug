@@ -1,5 +1,9 @@
 - FIX glitch with rapid keystrokes
 
+- sound
 - add READY state waiting for Arrow to start motion
-- make testable in REPL i.e. isolate IO types like Cmd, Keyboard, etc.
+- graphics: eyes + eyeball, eyes angle, dead eyes, eating mouth, narrow tail
+
 - Decouple animation smoothness from cellSize / track-size
+
+- switch to Lib/App (my throttle version of GraphicSVG) & resume SnakePic.elm
