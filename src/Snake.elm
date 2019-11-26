@@ -105,6 +105,11 @@ nextDirection oldDir key =
         newDir
 
 
+changeDirection : Maybe Key -> Snake -> Snake
+changeDirection key snake =
+    { snake | direction = nextDirection snake.direction key }
+
+
 stepHead : Head -> Direction -> Head
 stepHead ( i, j ) direction =
     case direction of
@@ -148,8 +153,8 @@ hitWall ( i, j ) walls =
     i < walls.left || i > walls.right || j < walls.bottom || j > walls.top
 
 
-stepSnake : Snake -> Food -> Snake
-stepSnake snake food =
+stepSnake : Food -> Snake -> Snake
+stepSnake food snake =
     let
         nextHead =
             stepHead snake.head snake.direction

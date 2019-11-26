@@ -132,9 +132,7 @@ update msg model =
                         snake =
                             model.snake
                     in
-                    ( { model
-                        | snake = { snake | direction = Snake.nextDirection snake.direction key }
-                      }
+                    ( { model | snake = Snake.changeDirection key snake }
                     , Cmd.none
                     )
 
@@ -146,7 +144,7 @@ step : Model -> ( Model, Cmd Msg )
 step model =
     let
         newSnake =
-            Snake.stepSnake model.snake model.food
+            Snake.stepSnake model.food model.snake
     in
     ( { model | snake = newSnake }
     , if newSnake.state == Eating then
