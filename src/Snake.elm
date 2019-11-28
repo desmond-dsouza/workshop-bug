@@ -42,7 +42,7 @@ viewSnakeHead snake =
                 )
 
         head =
-            roundedRect (1 |> toGrid) (1 |> toGrid) 5
+            roundedRect (1 |> toGrid) (1 |> toGrid) (0.25 |> fracToGrid)
                 |> filled
                     (case snake.state of
                         Normal ->
@@ -70,7 +70,7 @@ viewSnakeHead snake =
 
 viewSnakeSegment : Segment -> Shape msg
 viewSnakeSegment ( posX, posY ) =
-    roundedRect (1 |> toGrid) (1 |> toGrid) 5 |> filled black |> move ( posX |> toGrid, posY |> toGrid )
+    circle (0.5 |> fracToGrid) |> filled black |> move ( posX |> toGrid, posY |> toGrid )
 
 
 invalidTransitions : List ( Direction, Direction )
@@ -153,8 +153,8 @@ hitWall ( i, j ) walls =
     i < walls.left || i > walls.right || j < walls.bottom || j > walls.top
 
 
-stepSnake : Food -> Snake -> Snake
-stepSnake food snake =
+stepSnake : Food -> Walls -> Snake -> Snake
+stepSnake food walls snake =
     let
         nextHead =
             stepHead snake.head snake.direction
@@ -166,13 +166,13 @@ stepSnake food snake =
             stepBody snake.head nextGotFood snake.body
 
         nextHitWall =
-            hitWall nextHead Grid.walls
+            hitWall nextHead walls
 
         nextState =
             if hitSelf nextHead nextBody then
                 HitSelf
 
-            else if hitWall nextHead Grid.walls then
+            else if hitWall nextHead walls then
                 HitWall
 
             else if nextGotFood then

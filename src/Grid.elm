@@ -1,4 +1,4 @@
-module Grid exposing (fracToGrid, grid, toGrid, view, viewport, walls)
+module Grid exposing (cellSize, fracToGrid, grid, toGrid, view, viewport, walls)
 
 import Debug
 import GraphicSVG exposing (..)
@@ -65,7 +65,7 @@ viewCoordinates =
 
 view : List (Shape msg)
 view =
-    [ graphPaper cellSize
+    [ graphPaperCustom cellSize 0.5 lightGrey
     , rect ((grid.numColumns + 1) |> toGrid)
         ((grid.numRows + 1) |> toGrid)
         |> outlined (solid 3) darkGrey

@@ -96,7 +96,7 @@ isGameOver g =
 
 viewGameOver : List (Shape Msg)
 viewGameOver =
-    [ text "GAME OVER" |> size 24 |> centered |> filled red ]
+    [ text "GAME OVER" |> size (1.5 |> Grid.fracToGrid) |> centered |> filled red ]
 
 
 
@@ -110,7 +110,7 @@ update msg model =
             ( model, Cmd.none )
 
         Tick time ->
-            step model
+            step Grid.walls model
 
         KeyDown k ->
             let
@@ -140,11 +140,11 @@ update msg model =
             ( { model | food = food }, Cmd.none )
 
 
-step : Model -> ( Model, Cmd Msg )
-step model =
+step : Walls -> Model -> ( Model, Cmd Msg )
+step walls model =
     let
         newSnake =
-            Snake.stepSnake model.food model.snake
+            Snake.stepSnake model.food walls model.snake
     in
     ( { model | snake = newSnake }
     , if newSnake.state == Eating then
