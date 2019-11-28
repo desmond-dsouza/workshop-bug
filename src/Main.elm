@@ -35,7 +35,7 @@ main =
 
 
 tickDelay =
-    100
+    500
 
 
 subscriptions : Model -> Sub Msg

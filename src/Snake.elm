@@ -42,7 +42,7 @@ viewSnakeHead snake =
                 )
 
         head =
-            rect (1 |> toGrid) (1 |> toGrid)
+            roundedRect (1 |> toGrid) (1 |> toGrid) 5
                 |> filled
                     (case snake.state of
                         Normal ->
@@ -70,7 +70,7 @@ viewSnakeHead snake =
 
 viewSnakeSegment : Segment -> Shape msg
 viewSnakeSegment ( posX, posY ) =
-    rect (1 |> toGrid) (1 |> toGrid) |> filled black |> move ( posX |> toGrid, posY |> toGrid )
+    roundedRect (1 |> toGrid) (1 |> toGrid) 5 |> filled black |> move ( posX |> toGrid, posY |> toGrid )
 
 
 invalidTransitions : List ( Direction, Direction )

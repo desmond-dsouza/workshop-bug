@@ -1,4 +1,6 @@
-- FIX glitch with rapid keystrokes
+- use Wedge for head: direction + animation
+
+- FIX glitch with rapid keystrokes: currDir vs. turnReq
 
 - sound
 - add READY state waiting for Arrow to start motion

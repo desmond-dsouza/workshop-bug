@@ -54,7 +54,7 @@ viewCoordinates =
     in
     [ text "Black: i-j coordinates" |> centered |> filled black |> move ( 0, 62 )
     , text "Red: grid distances" |> centered |> filled red |> move ( 0, 42 )
-    , text "Unit cell = 10x10 (grid)" |> centered |> filled red |> move ( 0, 22 )
+    , text "Unit cell = 20x20 (grid)" |> centered |> filled red |> move ( 0, 22 )
     , text "(0,0)" |> centered |> filled black |> move ( 0, 0 )
     , text (Debug.toString ( i0, j0 )) |> centered |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
     , text (Debug.toString ( i1, j1 )) |> centered |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
