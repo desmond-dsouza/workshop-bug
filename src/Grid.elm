@@ -66,7 +66,9 @@ viewCoordinates =
 view : List (Shape msg)
 view =
     [ graphPaperCustom cellSize 0.5 lightGrey
-    , rect ((grid.numColumns + 1) |> toGrid)
+    , circle (0.05 * cellSize) |> filled black
+    , rect
+        ((grid.numColumns + 1) |> toGrid)
         ((grid.numRows + 1) |> toGrid)
         |> outlined (solid 3) darkGrey
     ]

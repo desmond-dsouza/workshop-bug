@@ -64,7 +64,7 @@ initialModel =
     { snake =
         { head = ( -2, 0 )
         , body =
-            [ ( -3, 0 ) ]
+            [ ( -3, 0 ), ( -4, 0 ) ]
         , direction = Right
         , state = Normal
         }
@@ -79,8 +79,8 @@ initialModel =
 view : Model -> List (Shape Msg)
 view model =
     Grid.view
-        ++ Snake.view model.snake
         ++ Food.view model.food
+        ++ Snake.view model.snake
         ++ (if isGameOver model then
                 viewGameOver
 
