@@ -22,25 +22,6 @@ viewSnakeHead snake =
         ( headX0, headY0 ) =
             ( i |> toGrid, j |> toGrid )
 
-        eyeRadius =
-            0.15 |> fracToGrid
-
-        rotation =
-            degrees
-                (case snake.direction of
-                    Right ->
-                        0
-
-                    Up ->
-                        90
-
-                    Left ->
-                        180
-
-                    Down ->
-                        270
-                )
-
         head =
             roundedRect (1 |> toGrid) (1 |> toGrid) (0.25 |> fracToGrid)
                 |> filled
@@ -59,11 +40,38 @@ viewSnakeHead snake =
                     )
                 |> move ( headX0, headY0 )
 
+        eyeRadius =
+            0.15 |> fracToGrid
+
+        eyeRotation =
+            degrees
+                (case snake.direction of
+                    Right ->
+                        0
+
+                    Up ->
+                        90
+
+                    Left ->
+                        180
+
+                    Down ->
+                        270
+                )
+
         eyeLeft =
-            circle eyeRadius |> filled black |> move ( 0.25 |> fracToGrid, 0.25 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
+            circle eyeRadius
+                |> filled black
+                |> move ( 0.25 |> fracToGrid, 0.25 |> fracToGrid )
+                |> rotate eyeRotation
+                |> move ( headX0, headY0 )
 
         eyeRight =
-            circle eyeRadius |> filled black |> move ( 0.25 |> fracToGrid, -0.25 |> fracToGrid ) |> rotate rotation |> move ( headX0, headY0 )
+            circle eyeRadius
+                |> filled black
+                |> move ( 0.25 |> fracToGrid, -0.25 |> fracToGrid )
+                |> rotate eyeRotation
+                |> move ( headX0, headY0 )
     in
     [ head, eyeLeft, eyeRight ]
 
