@@ -1,5 +1,5 @@
 
-- FIX glitch with rapid keystrokes: currDirection vs. turnRequest
+- FIX the glitch with rapid keystrokes: currDirection vs. turnRequest
 
 - sound
 - add READY state waiting for Arrow to start motion
