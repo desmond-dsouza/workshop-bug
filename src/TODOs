@@ -1,11 +1,8 @@
-- use Wedge for head: direction + animation
 
 - FIX glitch with rapid keystrokes: currDir vs. turnReq
 
 - sound
 - add READY state waiting for Arrow to start motion
 - graphics: eyes + eyeball, eyes angle, dead eyes, eating mouth, narrow tail
-
-- Decouple animation smoothness from cellSize / track-size
 
 - switch to Lib/App (my throttle version of GraphicSVG) & resume SnakePic.elm

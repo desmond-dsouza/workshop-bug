@@ -1,4 +1,4 @@
-module Grid exposing (cellSize, fracToGrid, grid, toGrid, view, viewport, walls)
+module Grid exposing (fracToGrid, grid, toGrid, view, viewport, walls)
 
 import Debug
 import GraphicSVG exposing (..)
@@ -10,22 +10,17 @@ import Types exposing (..)
 grid : Grid
 grid =
     -- best to use even numbers for cols & rows
-    { numColumns = 14, numRows = 14 }
-
-
-cellSize : Float
-cellSize =
-    20.0
+    { numColumns = 14, numRows = 14, cellSize = 20.0 }
 
 
 toGrid : Int -> Float
 toGrid i =
-    cellSize * toFloat i
+    grid.cellSize * toFloat i
 
 
 fracToGrid : Float -> Float
 fracToGrid f =
-    cellSize * f
+    grid.cellSize * f
 
 
 walls : Walls
@@ -51,22 +46,28 @@ viewCoordinates =
 
         downY =
             -12.0
+
+        toString ( i, j ) =
+            "(" ++ String.fromInt i ++ "," ++ String.fromInt j ++ ")"
+
+        toStringF ( x, y ) =
+            "(" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
     in
     [ text "Black: i-j coordinates" |> centered |> filled black |> move ( 0, 62 )
     , text "Red: grid distances" |> centered |> filled red |> move ( 0, 42 )
     , text "Unit cell = 20x20 (grid)" |> centered |> filled red |> move ( 0, 22 )
     , text "(0,0)" |> centered |> filled black |> move ( 0, 0 )
-    , text (Debug.toString ( i0, j0 )) |> centered |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
-    , text (Debug.toString ( i1, j1 )) |> centered |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
-    , text (Debug.toString ( i0 |> toGrid, j0 |> toGrid )) |> centered |> filled red |> move ( i0 |> toGrid, downY + toGrid j0 )
-    , text (Debug.toString ( i1 |> toGrid, j1 |> toGrid )) |> centered |> filled red |> move ( i1 |> toGrid, downY + toGrid j1 )
+    , text (toString ( i0, j0 )) |> centered |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
+    , text (toString ( i1, j1 )) |> centered |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
+    , text (toStringF ( i0 |> toGrid, j0 |> toGrid )) |> centered |> filled red |> move ( i0 |> toGrid, downY + toGrid j0 )
+    , text (toStringF ( i1 |> toGrid, j1 |> toGrid )) |> centered |> filled red |> move ( i1 |> toGrid, downY + toGrid j1 )
     ]
 
 
 view : List (Shape msg)
 view =
-    [ graphPaperCustom cellSize 0.5 lightGrey
-    , circle (0.05 * cellSize) |> filled black
+    [ graphPaperCustom grid.cellSize 0.5 lightGrey
+    , circle (0.05 * grid.cellSize) |> filled black
     , rect
         ((grid.numColumns + 1) |> toGrid)
         ((grid.numRows + 1) |> toGrid)
