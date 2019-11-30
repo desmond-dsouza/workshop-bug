@@ -2,9 +2,9 @@ module Snake exposing (..)
 
 import Debug
 import GraphicSVG exposing (..)
+import GraphicSVG.App exposing (graphicsApp)
 import Grid exposing (fracToGrid, grid, toGrid)
 import Keyboard exposing (Key(..))
-import Lib.App as App
 import Types exposing (Body, Direction(..), Food, Head, Position, Segment, Snake, SnakeState(..), Walls)
 
 
@@ -113,8 +113,8 @@ nextDirection oldDir key =
         newDir
 
 
-changeDirection : Maybe Key -> Snake -> Snake
-changeDirection key snake =
+turn : Maybe Key -> Snake -> Snake
+turn key snake =
     { snake | direction = nextDirection snake.direction key }
 
 
@@ -136,6 +136,11 @@ stepHead ( i, j ) direction =
 
 stepBody : Head -> Bool -> Body -> Body
 stepBody currHead gotFoodNext currBody =
+    let
+        removeLast : List a -> List a
+        removeLast list =
+            List.take (List.length list - 1) list
+    in
     currHead
         :: (case gotFoodNext of
                 True ->
@@ -173,9 +178,6 @@ stepSnake food walls snake =
         nextBody =
             stepBody snake.head nextGotFood snake.body
 
-        nextHitWall =
-            hitWall nextHead walls
-
         nextState =
             if hitSelf nextHead nextBody then
                 HitSelf
@@ -192,11 +194,6 @@ stepSnake food walls snake =
     { snake | head = nextHead, body = nextBody, state = nextState }
 
 
-removeLast : List a -> List a
-removeLast list =
-    List.take (List.length list - 1) list
-
-
 main =
     let
         initialSnake =
@@ -209,5 +206,5 @@ main =
             , state = Normal
             }
     in
-    App.graphicsApp
+    graphicsApp
         { view = Grid.viewport (Grid.view ++ view initialSnake) }

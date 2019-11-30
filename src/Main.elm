@@ -1,10 +1,9 @@
 module Main exposing (..)
 
 import Food
-import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)
+import GraphicSVG exposing (Shape, app, blue, centered, collage, filled, move, red, size, text)
 import Grid
 import Keyboard exposing (Key(..))
-import Lib.App as App
 import Snake
 import Time
 import Types exposing (..)
@@ -16,17 +15,23 @@ import Types exposing (..)
 
 main : GraphicSVG.App () Model Msg
 main =
-    GraphicSVG.app
-        { init = \_ _ _ -> init
-        , view =
-            \m ->
-                { title = "SNEK"
-                , body = Grid.viewport (view m)
-                }
+    let
+        initF _ _ _ =
+            initialModelCmd
+
+        viewF model =
+            { title = "Snake", body = Grid.viewport (view model) }
+
+        emptyF _ =
+            NoOp
+    in
+    app
+        { init = initF
+        , view = viewF
         , update = update
         , subscriptions = subscriptions
-        , onUrlChange = \_ -> NoOp
-        , onUrlRequest = \u -> NoOp
+        , onUrlChange = emptyF
+        , onUrlRequest = emptyF
         }
 
 
@@ -54,8 +59,8 @@ subscriptions m =
 -- INIT ----------------
 
 
-init : ( Model, Cmd Msg )
-init =
+initialModelCmd : ( Model, Cmd Msg )
+initialModelCmd =
     ( initialModel, Cmd.none )
 
 
@@ -132,7 +137,7 @@ update msg model =
                         snake =
                             model.snake
                     in
-                    ( { model | snake = Snake.changeDirection key snake }
+                    ( { model | snake = Snake.turn key snake }
                     , Cmd.none
                     )
 

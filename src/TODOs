@@ -1,8 +1,0 @@
-
-- FIX the glitch with rapid keystrokes: currDirection vs. turnRequest
-
-- sound
-- add READY state waiting for Arrow to start motion
-- graphics: eyes + eyeball, eyes angle, dead eyes, eating mouth, narrow tail
-
-- switch to Lib/App (my throttle version of GraphicSVG) & resume SnakePic.elm

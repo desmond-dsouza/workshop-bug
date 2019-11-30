@@ -1,8 +1,8 @@
 module Food exposing (..)
 
 import GraphicSVG exposing (..)
+import GraphicSVG.App exposing (graphicsApp)
 import Grid exposing (grid, toGrid)
-import Lib.App as App
 import Random
 import Types
 
@@ -38,7 +38,7 @@ apple size =
 
 
 main =
-    App.graphicsApp
+    graphicsApp
         { view =
             Grid.viewport
                 (Grid.view ++ view ( 5, 5 ))

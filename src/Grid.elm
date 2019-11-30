@@ -2,8 +2,7 @@ module Grid exposing (fracToGrid, grid, toGrid, view, viewport, walls)
 
 import Debug
 import GraphicSVG exposing (..)
-import Html exposing (Html)
-import Lib.App as App
+import GraphicSVG.App exposing (graphicsApp)
 import Types exposing (..)
 
 
@@ -80,5 +79,5 @@ viewport =
 
 
 main =
-    App.graphicsApp
+    graphicsApp
         { view = viewport (view ++ viewCoordinates) }
