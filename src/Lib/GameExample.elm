@@ -6,7 +6,7 @@ import Lib.WkApp as App
 
 main =
     --  game: tick, throttle, minimal model/view/update
-    App.game
+    App.simpleGameApp
         (App.Every 1000)
         Tick
         { init = initialModel

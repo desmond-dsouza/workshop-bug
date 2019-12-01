@@ -8760,7 +8760,7 @@ var $author$project$Lib$WkApp$wkGameApp = F3(
 				}
 			});
 	});
-var $author$project$Lib$WkApp$cmdGame = F3(
+var $author$project$Lib$WkApp$cmdGameApp = F3(
 	function (tickRate, tickMsg, userApp) {
 		var initFlags = function (flags) {
 			return _Utils_Tuple2(userApp.init.a, userApp.init.b);
@@ -9635,8 +9635,8 @@ var $author$project$Grid$viewport = A2(
 	$author$project$Grid$toGrid($author$project$Grid$grid.numColumns + 4),
 	$author$project$Grid$toGrid($author$project$Grid$grid.numRows + 4));
 var $author$project$Main$main = A3(
-	$author$project$Lib$WkApp$cmdGame,
-	$author$project$Lib$WkApp$Every(1000),
+	$author$project$Lib$WkApp$cmdGameApp,
+	$author$project$Lib$WkApp$Every(400),
 	$author$project$Types$Tick,
 	{
 		init: _Utils_Tuple2($author$project$Main$initialModel, $elm$core$Platform$Cmd$none),

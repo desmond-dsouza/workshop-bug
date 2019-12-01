@@ -2,7 +2,7 @@ module Lib.WkApp exposing
     ( graphicsApp, GraphicsApp, notificationsApp, NotificationsApp, gameApp, GameApp
     , InputHandler, GetKeyState, Keys(..), KeyState(..)
     , EllieAppWithTick, ellieAppWithTick
-    , TickRate(..), audioGame, cmdGame, game, wkGameApp
+    , TickRate(..), cmdGameApp, simpleGameApp, wkGameApp
     )
 
 {-| The methods in this library are analogous to those in GraphicSVG.App; however,
@@ -872,7 +872,7 @@ wkGameApp tickRate tickMsg userApp =
         }
 
 
-game :
+simpleGameApp :
     TickRate
     -> InputHandler userMsg
     ->
@@ -882,7 +882,7 @@ game :
         , title : String
         }
     -> EllieAppWithTick () userModel userMsg
-game tickRate tickMsg userApp =
+simpleGameApp tickRate tickMsg userApp =
     let
         initFlags : () -> ( userModel, Cmd userMsg )
         initFlags flags =
@@ -898,7 +898,7 @@ game tickRate tickMsg userApp =
         }
 
 
-cmdGame :
+cmdGameApp :
     TickRate
     -> InputHandler userMsg
     ->
@@ -908,7 +908,7 @@ cmdGame :
         , title : String
         }
     -> EllieAppWithTick () userModel userMsg
-cmdGame tickRate tickMsg userApp =
+cmdGameApp tickRate tickMsg userApp =
     let
         initFlags : () -> ( userModel, Cmd userMsg )
         initFlags flags =
@@ -922,7 +922,3 @@ cmdGame tickRate tickMsg userApp =
         , update = \msg model -> userApp.update msg model
         , subscriptions = \m -> Sub.none
         }
-
-
-audioGame =
-    ()

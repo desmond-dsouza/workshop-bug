@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "name": "Snake",
+    "routes": [
+        {
+            "src": "/",
+            "dest": "game.html"
+        }
+    ]
+}

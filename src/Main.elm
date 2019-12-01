@@ -18,8 +18,8 @@ port playSound : String -> Cmd msg
 
 
 main =
-    App.cmdGame
-        (App.Every 1000)
+    App.cmdGameApp
+        (App.Every 400)
         Tick
         { init = ( initialModel, Cmd.none )
         , view = \model -> Grid.viewport (view model)
