@@ -1,6 +1,5 @@
 module Types exposing (..)
 
-import Keyboard exposing (Key(..))
 import Lib.WkApp as App
 import Time
 

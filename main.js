@@ -9244,45 +9244,41 @@ var $author$project$Main$update = F2(
 			var time = msg.a;
 			var _v1 = msg.b;
 			var keyFunc = _v1.a;
-			var _v2 = _v1.b;
-			var dx1 = _v2.a;
-			var dy1 = _v2.b;
-			var _v3 = _v1.c;
-			var dx2 = _v3.a;
-			var dy2 = _v3.b;
-			var _v4 = _Utils_Tuple2(
+			var sumOfArrows1 = _v1.b;
+			var sumOfArrows2 = _v1.c;
+			var _v2 = _Utils_Tuple2(
 				model.snake.state,
 				$author$project$Main$userRequest(keyFunc));
-			_v4$2:
+			_v2$2:
 			while (true) {
-				_v4$3:
+				_v2$3:
 				while (true) {
-					switch (_v4.a.$) {
+					switch (_v2.a.$) {
 						case 'HitSelf':
-							switch (_v4.b.$) {
+							switch (_v2.b.$) {
 								case 'NewGame':
-									var _v5 = _v4.a;
-									var _v6 = _v4.b;
+									var _v3 = _v2.a;
+									var _v4 = _v2.b;
 									return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Food$randomFoodCmd);
 								case 'Turn':
-									break _v4$2;
+									break _v2$2;
 								default:
-									break _v4$2;
+									break _v2$2;
 							}
 						case 'HitWall':
-							switch (_v4.b.$) {
+							switch (_v2.b.$) {
 								case 'NewGame':
-									var _v7 = _v4.a;
-									var _v8 = _v4.b;
+									var _v5 = _v2.a;
+									var _v6 = _v2.b;
 									return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Food$randomFoodCmd);
 								case 'Turn':
-									break _v4$3;
+									break _v2$3;
 								default:
-									break _v4$3;
+									break _v2$3;
 							}
 						default:
-							if (_v4.b.$ === 'Turn') {
-								var direction = _v4.b.a;
+							if (_v2.b.$ === 'Turn') {
+								var direction = _v2.b.a;
 								var snake = model.snake;
 								return A2(
 									$author$project$Main$step,
@@ -9297,10 +9293,10 @@ var $author$project$Main$update = F2(
 							}
 					}
 				}
-				var _v10 = _v4.a;
+				var _v8 = _v2.a;
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			}
-			var _v9 = _v4.a;
+			var _v7 = _v2.a;
 			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		} else {
 			var food = msg.a;

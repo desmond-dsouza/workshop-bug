@@ -3,7 +3,6 @@ port module Main exposing (..)
 import Food
 import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)
 import Grid
-import Keyboard exposing (Key(..))
 import Lib.WkApp as App exposing (KeyState(..), Keys(..))
 import Snake
 import Time
@@ -100,7 +99,7 @@ userRequest keyF =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Tick time ( keyFunc, ( dx1, dy1 ), ( dx2, dy2 ) ) ->
+        Tick time ( keyFunc, sumOfArrows1, sumOfArrows2 ) ->
             case ( model.snake.state, userRequest keyFunc ) of
                 ( HitSelf, NewGame ) ->
                     ( initialModel, Food.randomFoodCmd )
