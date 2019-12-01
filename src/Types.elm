@@ -1,6 +1,7 @@
 module Types exposing (..)
 
 import Keyboard exposing (Key(..))
+import Lib.WkApp as App
 import Time
 
 
@@ -48,6 +49,12 @@ type SnakeState
     | HitWall
 
 
+type UserRequest
+    = NewGame
+    | Turn Direction
+    | None
+
+
 type alias Position =
     ( Int, Int )
 
@@ -61,7 +68,5 @@ type alias Walls =
 
 
 type Msg
-    = Tick Time.Posix
-    | KeyDown Keyboard.RawKey
+    = Tick Float App.GetKeyState
     | NewFood Position
-    | NoOp

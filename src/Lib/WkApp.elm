@@ -1,13 +1,12 @@
-module Lib.App exposing
+module Lib.WkApp exposing
     ( graphicsApp, GraphicsApp, notificationsApp, NotificationsApp, gameApp, GameApp
     , InputHandler, GetKeyState, Keys(..), KeyState(..)
-    , AppWithTick, appWithTick
-    , TickRate(..), gameAppThrottle
+    , EllieAppWithTick, ellieAppWithTick
+    , TickRate(..), audioGame, cmdGame, game, wkGameApp
     )
 
-{-| A module using the SVG graphics library to implement easily usable apps,
-which includes built-in functions for creating plain graphics, interactions, games
-and other applications including response to time, keyboard presses, and mouse actions.
+{-| The methods in this library are analogous to those in GraphicSVG.App; however,
+they are built upon `GraphicSVG.ellieApp` for compatibility with that platform.
 
 
 # Apps
@@ -20,9 +19,9 @@ and other applications including response to time, keyboard presses, and mouse a
 @docs InputHandler, GetKeyState, Keys, KeyState
 
 
-# Barebones app with keyboard and time
+# Barebones ellieApp with keyboard and time
 
-@docs AppWithTick, appWithTick
+@docs EllieAppWithTick, ellieAppWithTick
 
 -}
 
@@ -85,32 +84,12 @@ type KeyAction
     | WentDown
 
 
-subs : TickRate -> List (Sub (HiddenMsg userMsg))
-subs delta =
+subs : List (Sub (HiddenMsg userMsg))
+subs =
     [ onKeyUp (D.map KeyUp (D.field "keyCode" D.int))
     , onKeyDown (D.map KeyDown (D.field "keyCode" D.int))
-    , case delta of
-        Max ->
-            onAnimationFrame TickTime
-
-        Every t ->
-            Time.every t TickTime
+    , onAnimationFrame TickTime
     ]
-
-
-type TickRate
-    = Max
-    | Every Float
-
-
-timerSubscription : TickRate -> ((Time.Posix -> msg) -> Sub msg)
-timerSubscription delta =
-    case delta of
-        Max ->
-            Browser.Events.onAnimationFrame
-
-        Every t ->
-            Time.every t
 
 
 insertKeyDict : KeyDict -> KeyCode -> KeyAction -> KeyDict
@@ -399,8 +378,6 @@ type HiddenMsg userMsg
     | TickTime Time.Posix
     | KeyDown Int
     | KeyUp Int
-    | URLRequest Browser.UrlRequest
-    | URLChanged Url.Url
 
 
 {-| This type alias is only used as a target for a user `main` type signature
@@ -412,7 +389,7 @@ graphicsApp { view = view }
 Note that `userMsg` can be anything as no messages are used in this type of program.
 -}
 type alias GraphicsApp =
-    App () () (HiddenMsg ())
+    EllieApp () () ()
 
 
 {-| The simplest way to render graphics to the screen. These graphics will be
@@ -434,32 +411,12 @@ graphicsApp :
     }
     -> GraphicsApp
 graphicsApp userApp =
-    GraphicSVG.app
-        { init = \_ _ _ -> ( (), Cmd.none )
-        , update = hiddenGraphicsUpdate
-        , view = \userModel -> { title = "GraphicSVG Interactive App", body = mapCollage UserMsg userApp.view }
+    GraphicSVG.ellieApp
+        { init = \_ -> ( (), Cmd.none )
+        , update = \_ _ -> ( (), Cmd.none )
+        , view = \_ -> { title = "GraphicSVG Graphics App", body = userApp.view }
         , subscriptions = \_ -> Sub.none
-        , onUrlChange = URLChanged
-        , onUrlRequest = URLRequest
         }
-
-
-hiddenGraphicsUpdate :
-    HiddenMsg userMsg
-    -> ()
-    -> ( (), Cmd (HiddenMsg userMsg) )
-hiddenGraphicsUpdate msg key =
-    case msg of
-        URLRequest urlreq ->
-            case urlreq of
-                External url ->
-                    ( (), Nav.load url )
-
-                _ ->
-                    ( (), Cmd.none )
-
-        _ ->
-            ( (), Cmd.none )
 
 
 {-| This type alias is only used as a target for a user `main` type signature
@@ -473,7 +430,7 @@ where `Model` is the type alias of the user persistent model, and
 if other names are used, they can be substituted for these names.
 -}
 type alias NotificationsApp userModel userMsg =
-    App () userModel (HiddenMsg userMsg)
+    EllieApp () userModel (HiddenMsg userMsg)
 
 
 {-| Like `graphicsApp`, but you can add interactivity to your graphics by using the
@@ -492,15 +449,14 @@ model = model
 }
 so the functions that would be required to make the above `view` function work
 are as follows:
-type Msg
-= Change
+type Msg = Change
 update msg model =
 case msg of
 Change ->
 green
-main =
-notificationsApp
-{ model = red -- causes circle to start red
+main = notificationsApp
+{
+model = red -- causes circle to start red
 , update = update -- function which changes the model
 , view = view
 }
@@ -524,13 +480,11 @@ notificationsApp userApp =
         userView =
             userApp.view
     in
-    GraphicSVG.app
-        { init = \_ _ _ -> ( userInit, Task.perform InitTime Time.now )
+    GraphicSVG.ellieApp
+        { init = \_ -> ( userInit, Cmd.none )
         , update = hiddenNotifUpdate userUpdate
         , view = \userModel -> { title = "GraphicSVG Interactive App", body = mapCollage UserMsg <| userView userModel }
         , subscriptions = \_ -> Sub.none
-        , onUrlChange = URLChanged
-        , onUrlRequest = URLRequest
         }
 
 
@@ -544,17 +498,6 @@ hiddenNotifUpdate userUpdate msg userModel =
         UserMsg userMsg ->
             ( userUpdate userMsg userModel, Cmd.none )
 
-        URLRequest urlreq ->
-            case urlreq of
-                External url ->
-                    ( userModel, Nav.load url )
-
-                _ ->
-                    ( userModel, Cmd.none )
-
-        URLChanged url ->
-            ( userModel, Cmd.none )
-
         _ ->
             ( userModel, Cmd.none )
 
@@ -562,27 +505,29 @@ hiddenNotifUpdate userUpdate msg userModel =
 type alias HiddenModel userMsg =
     { tick : InputHandler userMsg
     , keys : KeyDict
-    , navKey : Nav.Key
     , initT : Time.Posix
     }
 
 
 {-| This type alias is only used as a target for a user `main` type signature to make
 the type signature more clear and concise when `main` calls `gameApp`:
-main : GameApp Model Msg
-main =
-gameApp Tick
-{ model = init
-, update = update
-, view = view
-}
+
+    main : GameApp Model Msg
+    main =
+        gameApp Tick
+            { model = init
+            , update = update
+            , view = view
+            }
+
 where `Tick` is the message handler called once per browser window update,
 `Model` is the type alias of the user persistent model, and
 `Msg` is the name of the user message type; if other names are used,
 they can be substituted for these names.
+
 -}
 type alias GameApp userModel userMsg =
-    App () ( userModel, HiddenModel userMsg ) (HiddenMsg userMsg)
+    EllieApp () ( userModel, HiddenModel userMsg ) (HiddenMsg userMsg)
 
 
 {-| Automatically maps time and keyboard presses to your program. This should
@@ -653,59 +598,27 @@ gameApp tickMsg userApp =
 
         userView =
             userApp.view
-
-        userTitle =
-            userApp.title
     in
-    GraphicSVG.app
-        { init = \_ _ navKey -> ( ( userInit, initHiddenModel tickMsg navKey ), Task.perform InitTime Time.now )
+    GraphicSVG.ellieApp
+        { init =
+            \_ ->
+                ( ( userInit, initHiddenModel tickMsg )
+                , Task.perform InitTime Time.now
+                )
         , update = hiddenGameUpdate userUpdate
-        , view = \( userModel, _ ) -> { title = userApp.title, body = mapCollage UserMsg <| userView userModel }
-        , subscriptions = \_ -> Sub.batch (subs Max)
-        , onUrlChange = URLChanged
-        , onUrlRequest = URLRequest
+        , view =
+            \( userModel, _ ) ->
+                { title = userApp.title
+                , body = mapCollage UserMsg <| userView userModel
+                }
+        , subscriptions = \_ -> Sub.batch subs
         }
 
 
-gameAppThrottle :
-    TickRate
-    -> InputHandler userMsg
-    ->
-        { model : userModel
-        , view : userModel -> Collage userMsg
-        , update : userMsg -> userModel -> userModel
-        , title : String
-        }
-    -> GameApp userModel userMsg
-gameAppThrottle ticker tickMsg userApp =
-    let
-        userInit =
-            userApp.model
-
-        userUpdate =
-            userApp.update
-
-        userView =
-            userApp.view
-
-        userTitle =
-            userApp.title
-    in
-    GraphicSVG.app
-        { init = \_ _ navKey -> ( ( userInit, initHiddenModel tickMsg navKey ), Task.perform InitTime Time.now )
-        , update = hiddenGameUpdate userUpdate
-        , view = \( userModel, _ ) -> { title = userApp.title, body = mapCollage UserMsg <| userView userModel }
-        , subscriptions = \_ -> Sub.batch (subs ticker)
-        , onUrlChange = URLChanged
-        , onUrlRequest = URLRequest
-        }
-
-
-initHiddenModel : InputHandler userMsg -> Nav.Key -> HiddenModel userMsg
-initHiddenModel tick navKey =
+initHiddenModel : InputHandler userMsg -> HiddenModel userMsg
+initHiddenModel tick =
     { tick = tick
     , keys = Dict.empty
-    , navKey = navKey
     , initT = millisToPosix 0
     }
 
@@ -752,41 +665,31 @@ hiddenGameUpdate userUpdate msg ( userModel, hiddenModel ) =
         KeyUp keyCode ->
             ( ( userModel, { hiddenModel | keys = insertKeyDict hiddenModel.keys keyCode WentUp } ), Cmd.none )
 
-        URLRequest urlreq ->
-            case urlreq of
-                External url ->
-                    ( ( userModel, hiddenModel ), Nav.load url )
-
-                _ ->
-                    ( ( userModel, hiddenModel ), Cmd.none )
-
-        URLChanged url ->
-            ( ( userModel, hiddenModel ), Cmd.none )
-
 
 {-| This type alias is only used as a target for a user `main` type signature to make
 the type signature more clear and concise when `main` calls `gameApp`:
-main : GameApp Model Msg
-main =
-appWithTick Tick
-{ model = init
-, update = update
-, view = view
-, subscriptions = subscriptions
-, onUrlRequest = OnUrlRequest
-, onUrlChange = OnUrlChange
-}
+
+    main : EllieAppWithTick Model Msg
+    main =
+        ellieAppWithTick Tick
+            { model = init
+            , update = update
+            , view = view
+            , subscriptions = subscriptions
+            }
+
 where `Tick` is the message handler called once per browser window update,
 `Model` is the type alias of the user persistent model, and
 `Msg` is the name of the user message type; if other names are used,
 they can be substituted for these names.
+
 -}
-type alias AppWithTick flags userModel userMsg =
-    App flags ( userModel, HiddenModel userMsg ) (HiddenMsg userMsg)
+type alias EllieAppWithTick flags userModel userMsg =
+    EllieApp flags ( userModel, HiddenModel userMsg ) (HiddenMsg userMsg)
 
 
-{-| A GraphicSVG.app with automatic time and keyboard presses passed into the update function.
-`appWithTick` takes two parameters: one is your own type of `InputHandler` message
+{-| A GraphicSVG.ellieApp with automatic time and keyboard presses passed into the update function.
+`ellieAppWithTick` takes two parameters: one is your own type of `InputHandler` message
 which will be automatically called each time the browser window is refreshed
 (30 times per second)
 of the form `Float -> GetKeyState -> UserMsg` and the other is
@@ -796,30 +699,23 @@ of the form `Float -> GetKeyState -> UserMsg` and the other is
     ,   view = view
     ,   update = update
     ,   subscriptions = subscriptions
-    ,   onUrlRequest = OnUrlRequest
-    ,   onUrlChange = OnUrlChange
     }
     where init is the model and initial commands, view is a collage and a title,
-    update is the usual update function with commands, subscriptions are things
+    update is the usual update function with commands, and subscriptions are things
     which you'd like to be notified about on a regular basis (e.g. changes in time,
-    incoming WebSocket messages), onUrlRequest is sent
-    whenever the user initiates a URL action (e.g. clicks a link) and onUrlChange
-    is when the user changes the url in the browser. See https://package.elm-lang.org/packages/elm/browser/latest/Browser#application
-    for a more clear description of these.
+    incoming WebSocket messages)
 
 -}
-appWithTick :
+ellieAppWithTick :
     InputHandler userMsg
     ->
-        { init : flags -> Url.Url -> Nav.Key -> ( userModel, Cmd userMsg )
+        { init : flags -> ( userModel, Cmd userMsg )
         , update : userMsg -> userModel -> ( userModel, Cmd userMsg )
         , view : userModel -> { title : String, body : Collage userMsg }
         , subscriptions : userModel -> Sub userMsg
-        , onUrlRequest : UrlRequest -> userMsg
-        , onUrlChange : Url.Url -> userMsg
         }
-    -> AppWithTick flags userModel userMsg
-appWithTick tickMsg userApp =
+    -> EllieAppWithTick flags userModel userMsg
+ellieAppWithTick tickMsg userApp =
     let
         userInit =
             userApp.init
@@ -832,24 +728,18 @@ appWithTick tickMsg userApp =
 
         userSubs =
             userApp.subscriptions
-
-        userUrlReq =
-            userApp.onUrlRequest
-
-        userUrlChange =
-            userApp.onUrlChange
     in
-    GraphicSVG.app
+    GraphicSVG.ellieApp
         { init =
-            \flags url navKey ->
+            \flags ->
                 let
                     userInitModel =
-                        Tuple.first <| userInit flags url navKey
+                        Tuple.first <| userInit flags
 
                     userInitCmds =
-                        Tuple.second <| userInit flags url navKey
+                        Tuple.second <| userInit flags
                 in
-                ( ( userInitModel, initHiddenModel tickMsg navKey ), Cmd.batch [ Task.perform InitTime Time.now, Cmd.map UserMsg userInitCmds ] )
+                ( ( userInitModel, initHiddenModel tickMsg ), Cmd.batch [ Task.perform InitTime Time.now, Cmd.map UserMsg userInitCmds ] )
         , update = hiddenTickUpdate userUpdate
         , view =
             \( userModel, _ ) ->
@@ -858,9 +748,7 @@ appWithTick tickMsg userApp =
                         userView userModel
                 in
                 { title = userViewE.title, body = mapCollage UserMsg userViewE.body }
-        , subscriptions = \( userModel, _ ) -> Sub.batch <| (Sub.map UserMsg <| userSubs userModel) :: subs Max
-        , onUrlChange = UserMsg << userUrlChange
-        , onUrlRequest = UserMsg << userUrlReq
+        , subscriptions = \( userModel, _ ) -> Sub.batch <| (Sub.map UserMsg <| userSubs userModel) :: subs
         }
 
 
@@ -910,5 +798,131 @@ hiddenTickUpdate userUpdate msg ( userModel, hiddenModel ) =
         KeyUp keyCode ->
             ( ( userModel, { hiddenModel | keys = insertKeyDict hiddenModel.keys keyCode WentUp } ), Cmd.none )
 
-        _ ->
-            ( ( userModel, hiddenModel ), Cmd.none )
+
+
+{- Throttled Version of ellieAppWithTick -}
+
+
+type TickRate
+    = Max
+    | Every Float
+    | Never
+
+
+subsThrottle : TickRate -> List (Sub (HiddenMsg userMsg))
+subsThrottle delta =
+    [ onKeyUp (D.map KeyUp (D.field "keyCode" D.int))
+    , onKeyDown (D.map KeyDown (D.field "keyCode" D.int))
+    , case delta of
+        Max ->
+            onAnimationFrame TickTime
+
+        Every t ->
+            Time.every t TickTime
+
+        Never ->
+            Sub.none
+    ]
+
+
+wkGameApp :
+    TickRate
+    -> InputHandler userMsg
+    ->
+        { init : flags -> ( userModel, Cmd userMsg )
+        , update : userMsg -> userModel -> ( userModel, Cmd userMsg )
+        , view : userModel -> { title : String, body : Collage userMsg }
+        , subscriptions : userModel -> Sub userMsg
+        }
+    -> EllieAppWithTick flags userModel userMsg
+wkGameApp tickRate tickMsg userApp =
+    let
+        userInit =
+            userApp.init
+
+        userUpdate =
+            userApp.update
+
+        userView =
+            userApp.view
+
+        userSubs =
+            userApp.subscriptions
+    in
+    GraphicSVG.ellieApp
+        { init =
+            \flags ->
+                let
+                    userInitModel =
+                        Tuple.first <| userInit flags
+
+                    userInitCmds =
+                        Tuple.second <| userInit flags
+                in
+                ( ( userInitModel, initHiddenModel tickMsg ), Cmd.batch [ Task.perform InitTime Time.now, Cmd.map UserMsg userInitCmds ] )
+        , update = hiddenTickUpdate userUpdate
+        , view =
+            \( userModel, _ ) ->
+                let
+                    userViewE =
+                        userView userModel
+                in
+                { title = userViewE.title, body = mapCollage UserMsg userViewE.body }
+        , subscriptions = \( userModel, _ ) -> Sub.batch <| (Sub.map UserMsg <| userSubs userModel) :: subsThrottle tickRate
+        }
+
+
+game :
+    TickRate
+    -> InputHandler userMsg
+    ->
+        { init : userModel
+        , view : userModel -> Collage userMsg
+        , update : userMsg -> userModel -> userModel
+        , title : String
+        }
+    -> EllieAppWithTick () userModel userMsg
+game tickRate tickMsg userApp =
+    let
+        initFlags : () -> ( userModel, Cmd userMsg )
+        initFlags flags =
+            ( userApp.init, Cmd.none )
+    in
+    wkGameApp
+        tickRate
+        tickMsg
+        { init = initFlags
+        , view = \m -> { title = userApp.title, body = userApp.view m }
+        , update = \msg model -> ( userApp.update msg model, Cmd.none )
+        , subscriptions = \m -> Sub.none
+        }
+
+
+cmdGame :
+    TickRate
+    -> InputHandler userMsg
+    ->
+        { init : ( userModel, Cmd userMsg )
+        , view : userModel -> Collage userMsg
+        , update : userMsg -> userModel -> ( userModel, Cmd userMsg )
+        , title : String
+        }
+    -> EllieAppWithTick () userModel userMsg
+cmdGame tickRate tickMsg userApp =
+    let
+        initFlags : () -> ( userModel, Cmd userMsg )
+        initFlags flags =
+            ( Tuple.first userApp.init, Tuple.second userApp.init )
+    in
+    wkGameApp
+        tickRate
+        tickMsg
+        { init = initFlags
+        , view = \m -> { title = userApp.title, body = userApp.view m }
+        , update = \msg model -> userApp.update msg model
+        , subscriptions = \m -> Sub.none
+        }
+
+
+audioGame =
+    ()

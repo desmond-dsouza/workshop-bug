@@ -1,9 +1,10 @@
 module Main exposing (..)
 
 import Food
-import GraphicSVG exposing (Shape, app, blue, centered, collage, filled, move, red, size, text)
+import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)
 import Grid
 import Keyboard exposing (Key(..))
+import Lib.WkApp as App exposing (KeyState(..), Keys(..))
 import Snake
 import Time
 import Types exposing (..)
@@ -13,55 +14,19 @@ import Types exposing (..)
 -- MAIN -------------------
 
 
-main : GraphicSVG.App () Model Msg
 main =
-    let
-        initF _ _ _ =
-            initialModelCmd
-
-        viewF model =
-            { title = "Snake", body = Grid.viewport (view model) }
-
-        emptyF _ =
-            NoOp
-    in
-    app
-        { init = initF
-        , view = viewF
+    App.cmdGame
+        (App.Every 100)
+        Tick
+        { init = ( initialModel, Cmd.none )
+        , view = \model -> Grid.viewport (view model)
         , update = update
-        , subscriptions = subscriptions
-        , onUrlChange = emptyF
-        , onUrlRequest = emptyF
+        , title = "Snake"
         }
 
 
 
--- SUBSCRIPTIONS ----------------
-
-
-tickDelay =
-    500
-
-
-subscriptions : Model -> Sub Msg
-subscriptions m =
-    if isGameOver m then
-        Keyboard.downs KeyDown
-
-    else
-        Sub.batch
-            [ Keyboard.downs KeyDown
-            , Time.every tickDelay Tick
-            ]
-
-
-
 -- INIT ----------------
-
-
-initialModelCmd : ( Model, Cmd Msg )
-initialModelCmd =
-    ( initialModel, Cmd.none )
 
 
 initialModel : Model
@@ -108,38 +73,57 @@ viewGameOver =
 -- UPDATE ----------------
 
 
+userRequest : (Keys -> KeyState) -> UserRequest
+userRequest keyF =
+    if keyF Space == JustDown then
+        NewGame
+
+    else if keyF LeftArrow == JustDown then
+        Turn Types.Left
+
+    else if keyF DownArrow == JustDown then
+        Turn Types.Down
+
+    else if keyF RightArrow == JustDown then
+        Turn Types.Right
+
+    else if keyF UpArrow == JustDown then
+        Turn Types.Up
+
+    else
+        None
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
 
-        Tick time ->
-            step Grid.walls model
-
-        KeyDown k ->
-            let
-                key =
-                    Keyboard.anyKeyOriginal k
-            in
-            case ( model.snake.state, key ) of
-                ( HitSelf, Just Keyboard.Spacebar ) ->
+        Tick time ( keyFunc, ( dx1, dy1 ), ( dx2, dy2 ) ) ->
+            case ( model.snake.state, userRequest keyFunc ) of
+                ( HitSelf, NewGame ) ->
                     ( initialModel, Food.randomFoodCmd )
 
-                ( HitWall, Just Keyboard.Spacebar ) ->
+                ( HitWall, NewGame ) ->
                     ( initialModel, Food.randomFoodCmd )
 
                 ( HitSelf, _ ) ->
                     ( model, Cmd.none )
 
-                _ ->
+                ( HitWall, _ ) ->
+                    ( model, Cmd.none )
+
+                ( _, Turn direction ) ->
                     let
                         snake =
                             model.snake
                     in
-                    ( { model | snake = Snake.turn key snake }
-                    , Cmd.none
-                    )
+                    { model | snake = Snake.turn direction snake }
+                        |> step Grid.walls
+
+                ( _, _ ) ->
+                    model |> step Grid.walls
 
         NewFood food ->
             ( { model | food = food }, Cmd.none )

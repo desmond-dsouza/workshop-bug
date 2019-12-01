@@ -86,26 +86,8 @@ invalidTransitions =
     [ ( Left, Right ), ( Right, Left ), ( Up, Down ), ( Down, Up ) ]
 
 
-nextDirection : Direction -> Maybe Key -> Direction
-nextDirection oldDir key =
-    let
-        newDir =
-            case key of
-                Just ArrowRight ->
-                    Right
-
-                Just ArrowLeft ->
-                    Left
-
-                Just ArrowUp ->
-                    Up
-
-                Just ArrowDown ->
-                    Down
-
-                _ ->
-                    oldDir
-    in
+nextDirection : Direction -> Direction -> Direction
+nextDirection oldDir newDir =
     if List.member ( oldDir, newDir ) invalidTransitions then
         oldDir
 
@@ -113,9 +95,9 @@ nextDirection oldDir key =
         newDir
 
 
-turn : Maybe Key -> Snake -> Snake
-turn key snake =
-    { snake | direction = nextDirection snake.direction key }
+turn : Direction -> Snake -> Snake
+turn newDir snake =
+    { snake | direction = nextDirection snake.direction newDir }
 
 
 stepHead : Head -> Direction -> Head
