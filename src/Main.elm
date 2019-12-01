@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Food
 import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)
@@ -10,13 +10,16 @@ import Time
 import Types exposing (..)
 
 
+port playSound : String -> Cmd msg
+
+
 
 -- MAIN -------------------
 
 
 main =
     App.cmdGame
-        (App.Every 100)
+        (App.Every 1000)
         Tick
         { init = ( initialModel, Cmd.none )
         , view = \model -> Grid.viewport (view model)
@@ -133,9 +136,19 @@ step walls model =
             Snake.stepSnake model.food walls model.snake
     in
     ( { model | snake = newSnake }
-    , if newSnake.state == Eating then
-        Food.randomFoodCmd
+    , case newSnake.state of
+        Eating ->
+            Cmd.batch
+                [ Food.randomFoodCmd
+                , playSound "Sounds/success.wav"
+                ]
 
-      else
-        Cmd.none
+        HitSelf ->
+            playSound "Sounds/failure.wav"
+
+        HitWall ->
+            playSound "Sounds/failure.wav"
+
+        _ ->
+            Cmd.none
     )
