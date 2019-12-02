@@ -1,6 +1,5 @@
 module Grid exposing (fracToGrid, grid, toGrid, view, viewport, walls)
 
-import Debug
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (graphicsApp)
 import Types exposing (..)

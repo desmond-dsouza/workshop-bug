@@ -5,7 +5,6 @@ import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, s
 import Grid
 import Lib.WkApp as App exposing (KeyState(..), Keys(..))
 import Snake
-import Time
 import Types exposing (..)
 
 

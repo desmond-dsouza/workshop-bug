@@ -4,7 +4,6 @@ import Debug
 import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (graphicsApp)
 import Grid exposing (fracToGrid, grid, toGrid)
-import Keyboard exposing (Key(..))
 import Types exposing (Body, Direction(..), Food, Head, Position, Segment, Snake, SnakeState(..), Walls)
 
 
