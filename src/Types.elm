@@ -48,12 +48,6 @@ type SnakeState
     | HitWall
 
 
-type UserRequest
-    = NewGame
-    | Turn Direction
-    | None
-
-
 type alias Position =
     ( Int, Int )
 
@@ -69,3 +63,4 @@ type alias Walls =
 type Msg
     = Tick Float App.GetKeyState
     | NewFood Position
+    | NewGame

@@ -1,14 +1,13 @@
-port module Main exposing (..)
+module Main exposing (..)
+
+-- Collage, Shape, black, blue, centered, circle, collage, filled, move, notifyTap, outlined, red, size, text)
 
 import Food
-import GraphicSVG exposing (Shape, blue, centered, collage, filled, move, red, size, text)
+import GraphicSVG exposing (..)
 import Grid
 import Lib.WkApp as App exposing (KeyState(..), Keys(..))
 import Snake
 import Types exposing (..)
-
-
-port playSound : String -> Cmd msg
 
 
 
@@ -17,10 +16,10 @@ port playSound : String -> Cmd msg
 
 main =
     App.cmdGameApp
-        (App.Every 400)
+        (App.Every 150)
         Tick
         { init = ( initialModel, Cmd.none )
-        , view = \model -> Grid.viewport (view model)
+        , view = view
         , update = update
         , title = "Snake"
         }
@@ -43,21 +42,34 @@ initialModel =
     }
 
 
-
--- VIEW ----------------
-
-
-view : Model -> List (Shape Msg)
+view : Model -> Collage Types.Msg
 view model =
-    Grid.view
-        ++ Food.view model.food
-        ++ Snake.view model.snake
-        ++ (if isGameOver model then
-                viewGameOver
+    Grid.viewport
+        (Grid.view
+            ++ maybeNewGameButton model
+            ++ Food.view model.food
+            ++ Snake.view model.snake
+            ++ (if isGameOver model then
+                    viewGameOver
 
-            else
-                []
-           )
+                else
+                    []
+               )
+        )
+
+
+maybeNewGameButton model =
+    if isGameOver model then
+        [ text "Click to Play Again"
+            |> sansserif
+            |> centered
+            |> filled black
+            |> notifyTap Types.NewGame
+            |> move ( 0, 180 )
+        ]
+
+    else
+        []
 
 
 isGameOver : Model -> Bool
@@ -65,7 +77,7 @@ isGameOver g =
     g.snake.state == Types.HitSelf || g.snake.state == Types.HitWall
 
 
-viewGameOver : List (Shape Msg)
+viewGameOver : List (Shape Types.Msg)
 viewGameOver =
     [ text "GAME OVER" |> size (1.5 |> Grid.fracToGrid) |> centered |> filled red ]
 
@@ -74,8 +86,14 @@ viewGameOver =
 -- UPDATE ----------------
 
 
-userRequest : (Keys -> KeyState) -> UserRequest
-userRequest keyF =
+type UserRequest
+    = NewGame
+    | Turn Direction
+    | None
+
+
+decodeKeys : (Keys -> KeyState) -> UserRequest
+decodeKeys keyF =
     if keyF Space == JustDown then
         NewGame
 
@@ -95,11 +113,11 @@ userRequest keyF =
         None
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Types.Msg -> Model -> ( Model, Cmd Types.Msg )
 update msg model =
     case msg of
         Tick time ( keyFunc, sumOfArrows1, sumOfArrows2 ) ->
-            case ( model.snake.state, userRequest keyFunc ) of
+            case ( model.snake.state, decodeKeys keyFunc ) of
                 ( HitSelf, NewGame ) ->
                     ( initialModel, Food.randomFoodCmd )
 
@@ -126,8 +144,11 @@ update msg model =
         NewFood food ->
             ( { model | food = food }, Cmd.none )
 
+        Types.NewGame ->
+            ( initialModel, Cmd.none )
 
-step : Walls -> Model -> ( Model, Cmd Msg )
+
+step : Walls -> Model -> ( Model, Cmd Types.Msg )
 step walls model =
     let
         newSnake =
@@ -138,14 +159,14 @@ step walls model =
         Eating ->
             Cmd.batch
                 [ Food.randomFoodCmd
-                , playSound "Sounds/success.wav"
+                , App.playSound "Sounds/success.wav"
                 ]
 
         HitSelf ->
-            playSound "Sounds/failure.wav"
+            App.playSound "Sounds/failure.wav"
 
         HitWall ->
-            playSound "Sounds/failure.wav"
+            App.playSound "Sounds/failure.wav"
 
         _ ->
             Cmd.none

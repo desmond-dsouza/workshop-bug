@@ -4,15 +4,15 @@ import GraphicSVG exposing (..)
 import GraphicSVG.App exposing (graphicsApp)
 import Grid exposing (grid, toGrid)
 import Random
-import Types
+import Types exposing (Food, Msg(..), Position)
 
 
-randomFoodCmd : Cmd Types.Msg
+randomFoodCmd : Cmd Msg
 randomFoodCmd =
-    randomPosition Types.NewFood
+    randomPosition NewFood
 
 
-randomPosition : (Types.Position -> msg) -> Cmd msg
+randomPosition : (Position -> msg) -> Cmd msg
 randomPosition msg =
     Random.pair
         (Random.int -(grid.numColumns // 2) (grid.numColumns // 2))
@@ -20,7 +20,7 @@ randomPosition msg =
         |> Random.generate msg
 
 
-view : Types.Food -> List (Shape msg)
+view : Food -> List (Shape msg)
 view ( i, j ) =
     [ apple (1 |> toGrid)
         |> move ( i |> toGrid, j |> toGrid )

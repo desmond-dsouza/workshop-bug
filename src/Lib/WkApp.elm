@@ -1,8 +1,8 @@
-module Lib.WkApp exposing
+port module Lib.WkApp exposing
     ( graphicsApp, GraphicsApp, notificationsApp, NotificationsApp, gameApp, GameApp
     , InputHandler, GetKeyState, Keys(..), KeyState(..)
     , EllieAppWithTick, ellieAppWithTick
-    , TickRate(..), cmdGameApp, simpleGameApp, wkGameApp
+    , TickRate(..), cmdGameApp, playSound, simpleGameApp, wkGameApp
     )
 
 {-| The methods in this library are analogous to those in GraphicSVG.App; however,
@@ -34,6 +34,9 @@ import Json.Decode as D
 import Task
 import Time exposing (millisToPosix, posixToMillis)
 import Url
+
+
+port playSound : String -> Cmd msg
 
 
 {-| The `InputHandler` type alias descripts a message that contains a Float representing the time in seconds from

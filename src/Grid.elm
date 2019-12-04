@@ -65,7 +65,8 @@ viewCoordinates =
 view : List (Shape msg)
 view =
     [ graphPaperCustom grid.cellSize 0.5 lightGrey
-    , circle (0.05 * grid.cellSize) |> filled black
+
+    -- , circle (0.05 * grid.cellSize) |> filled black
     , rect
         ((grid.numColumns + 1) |> toGrid)
         ((grid.numRows + 1) |> toGrid)
@@ -74,7 +75,7 @@ view =
 
 
 viewport =
-    collage ((grid.numColumns + 4) |> toGrid) ((grid.numRows + 4) |> toGrid)
+    collage ((grid.numColumns + 8) |> toGrid) ((grid.numRows + 8) |> toGrid)
 
 
 main =
