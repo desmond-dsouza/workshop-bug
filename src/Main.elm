@@ -60,7 +60,7 @@ view model =
 
 maybeNewGameButton model =
     if isGameOver model then
-        [ text "Click to Play Again"
+        [ text "Play Again (arrows to steer)"
             |> sansserif
             |> centered
             |> filled black

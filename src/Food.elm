@@ -9,15 +9,14 @@ import Types exposing (Food, Msg(..), Position)
 
 randomFoodCmd : Cmd Msg
 randomFoodCmd =
-    randomPosition NewFood
+    let
+        walls =
+            Grid.walls
 
-
-randomPosition : (Position -> msg) -> Cmd msg
-randomPosition msg =
-    Random.pair
-        (Random.int -(grid.numColumns // 2) (grid.numColumns // 2))
-        (Random.int -(grid.numRows // 2) (grid.numRows // 2))
-        |> Random.generate msg
+        positionGenerator =
+            Random.pair (Random.int walls.left walls.right) (Random.int walls.bottom walls.top)
+    in
+    positionGenerator |> Random.generate NewFood
 
 
 view : Food -> List (Shape msg)

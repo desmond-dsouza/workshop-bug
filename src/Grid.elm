@@ -30,43 +30,9 @@ walls =
     }
 
 
-viewCoordinates : List (Shape msg)
-viewCoordinates =
-    let
-        { numColumns, numRows } =
-            grid
-
-        ( i0, j0 ) =
-            ( -numColumns // 2, -numRows // 2 )
-
-        ( i1, j1 ) =
-            ( numColumns // 2, numRows // 2 )
-
-        downY =
-            -12.0
-
-        toString ( i, j ) =
-            "(" ++ String.fromInt i ++ "," ++ String.fromInt j ++ ")"
-
-        toStringF ( x, y ) =
-            "(" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
-    in
-    [ text "Black: i-j coordinates" |> centered |> filled black |> move ( 0, 62 )
-    , text "Red: grid distances" |> centered |> filled red |> move ( 0, 42 )
-    , text "Unit cell = 20x20 (grid)" |> centered |> filled red |> move ( 0, 22 )
-    , text "(0,0)" |> centered |> filled black |> move ( 0, 0 )
-    , text (toString ( i0, j0 )) |> centered |> filled black |> move ( i0 |> toGrid, j0 |> toGrid )
-    , text (toString ( i1, j1 )) |> centered |> filled black |> move ( i1 |> toGrid, j1 |> toGrid )
-    , text (toStringF ( i0 |> toGrid, j0 |> toGrid )) |> centered |> filled red |> move ( i0 |> toGrid, downY + toGrid j0 )
-    , text (toStringF ( i1 |> toGrid, j1 |> toGrid )) |> centered |> filled red |> move ( i1 |> toGrid, downY + toGrid j1 )
-    ]
-
-
 view : List (Shape msg)
 view =
     [ graphPaperCustom grid.cellSize 0.5 lightGrey
-
-    -- , circle (0.05 * grid.cellSize) |> filled black
     , rect
         ((grid.numColumns + 1) |> toGrid)
         ((grid.numRows + 1) |> toGrid)
@@ -75,9 +41,9 @@ view =
 
 
 viewport =
-    collage ((grid.numColumns + 8) |> toGrid) ((grid.numRows + 8) |> toGrid)
+    collage ((grid.numColumns + 6) |> toGrid) ((grid.numRows + 6) |> toGrid)
 
 
 main =
     graphicsApp
-        { view = viewport (view ++ viewCoordinates) }
+        { view = viewport view }

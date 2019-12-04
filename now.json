@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "name": "Snake",
+    "name": "wkshop",
     "routes": [
         {
             "src": "/",

@@ -8981,16 +8981,15 @@ var $elm$random$Random$pair = F2(
 			genA,
 			genB);
 	});
-var $author$project$Food$randomPosition = function (msg) {
-	return A2(
-		$elm$random$Random$generate,
-		msg,
-		A2(
-			$elm$random$Random$pair,
-			A2($elm$random$Random$int, -(($author$project$Grid$grid.numColumns / 2) | 0), ($author$project$Grid$grid.numColumns / 2) | 0),
-			A2($elm$random$Random$int, -(($author$project$Grid$grid.numRows / 2) | 0), ($author$project$Grid$grid.numRows / 2) | 0)));
-};
-var $author$project$Food$randomFoodCmd = $author$project$Food$randomPosition($author$project$Types$NewFood);
+var $author$project$Grid$walls = {bottom: ((-$author$project$Grid$grid.numRows) / 2) | 0, left: ((-$author$project$Grid$grid.numColumns) / 2) | 0, right: ($author$project$Grid$grid.numColumns / 2) | 0, top: ($author$project$Grid$grid.numRows / 2) | 0};
+var $author$project$Food$randomFoodCmd = function () {
+	var walls = $author$project$Grid$walls;
+	var positionGenerator = A2(
+		$elm$random$Random$pair,
+		A2($elm$random$Random$int, walls.left, walls.right),
+		A2($elm$random$Random$int, walls.bottom, walls.top));
+	return A2($elm$random$Random$generate, $author$project$Types$NewFood, positionGenerator);
+}();
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Lib$WkApp$playSound = _Platform_outgoingPort('playSound', $elm$json$Json$Encode$string);
 var $author$project$Types$Eating = {$: 'Eating'};
@@ -9237,7 +9236,6 @@ var $author$project$Snake$turn = F2(
 				direction: A2($author$project$Snake$nextDirection, snake.direction, newDir)
 			});
 	});
-var $author$project$Grid$walls = {bottom: ((-$author$project$Grid$grid.numRows) / 2) | 0, left: ((-$author$project$Grid$grid.numColumns) / 2) | 0, right: ($author$project$Grid$grid.numColumns / 2) | 0, top: ($author$project$Grid$grid.numRows / 2) | 0};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -9392,7 +9390,7 @@ var $author$project$Main$maybeNewGameButton = function (model) {
 					$MacCASOutreach$graphicsvg$GraphicSVG$black,
 					$MacCASOutreach$graphicsvg$GraphicSVG$centered(
 						$MacCASOutreach$graphicsvg$GraphicSVG$sansserif(
-							$MacCASOutreach$graphicsvg$GraphicSVG$text('Click to Play Again'))))))
+							$MacCASOutreach$graphicsvg$GraphicSVG$text('Play Again (arrows to steer)'))))))
 		]) : _List_Nil;
 };
 var $MacCASOutreach$graphicsvg$GraphicSVG$darkGreen = A4($MacCASOutreach$graphicsvg$GraphicSVG$RGBA, 78, 154, 6, 1);
@@ -9662,8 +9660,8 @@ var $MacCASOutreach$graphicsvg$GraphicSVG$collage = F3(
 	});
 var $author$project$Grid$viewport = A2(
 	$MacCASOutreach$graphicsvg$GraphicSVG$collage,
-	$author$project$Grid$toGrid($author$project$Grid$grid.numColumns + 8),
-	$author$project$Grid$toGrid($author$project$Grid$grid.numRows + 8));
+	$author$project$Grid$toGrid($author$project$Grid$grid.numColumns + 6),
+	$author$project$Grid$toGrid($author$project$Grid$grid.numRows + 6));
 var $author$project$Main$view = function (model) {
 	return $author$project$Grid$viewport(
 		_Utils_ap(
