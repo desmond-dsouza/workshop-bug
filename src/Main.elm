@@ -1,7 +1,8 @@
-module BugSoln exposing (..)
+module Main exposing (..)
 
 import GraphicSVG exposing (..)
-import Lib.WkApp as App exposing (KeyState(..), Keys(..))
+import Lib.WkApp as App exposing (KeyState(..), Keys(..), playSound)
+import Random
 
 
 
@@ -87,6 +88,7 @@ type Msg
     | BoardTapAt ( Float, Float )
     | ResetBtnTap
     | JumpBtnTap
+    | NewX Float
 
 
 
@@ -139,6 +141,23 @@ decodeKeys keyF =
         Nothing
 
 
+playJumpCmd =
+    playSound "Sounds/jump.wav"
+
+
+playBumpCmd =
+    playSound "Sounds/bump.mp3"
+
+
+playSuccessCmd =
+    playSound "Sounds/success.wav"
+
+
+cmdForRandomX : Cmd Msg
+cmdForRandomX =
+    Random.float -5 5 |> Random.generate NewX
+
+
 update msg model =
     let
         { x, y, direction } =
@@ -148,41 +167,44 @@ update msg model =
         Tick seconds ( keyFunction, _, _ ) ->
             case ( decodeKeys keyFunction, direction ) of
                 ( Just Space, _ ) ->
-                    jump model |> step
+                    ( jump model |> step, playJumpCmd )
 
                 ( Just LeftArrow, Right ) ->
-                    { model | direction = Left } |> step
+                    ( { model | direction = Left } |> step, playBumpCmd )
 
                 ( Just RightArrow, Left ) ->
-                    { model | direction = Right } |> step
+                    ( { model | direction = Right } |> step, playBumpCmd )
 
                 ( _, _ ) ->
-                    model |> step
+                    ( model |> step, Cmd.none )
 
         ResetBtnTap ->
-            reset model
+            ( model, Cmd.batch [ playSuccessCmd, cmdForRandomX ] )
 
         JumpBtnTap ->
-            jump model |> step
+            ( jump model |> step, playJumpCmd )
 
         BoardTapAt ( tapX, tapY ) ->
             case ( model.direction, tapX <= model.x ) of
                 ( Right, True ) ->
-                    { model | direction = Left }
+                    ( { model | direction = Left }, playBumpCmd )
 
                 ( Left, False ) ->
-                    { model | direction = Right }
+                    ( { model | direction = Right }, playBumpCmd )
 
                 _ ->
-                    model
+                    ( model, Cmd.none )
+
+        NewX xPos ->
+            ( { model | x = xPos }, Cmd.none )
 
 
 main =
-    App.simpleGameApp
+    App.cmdGameApp
         (App.Every 300)
         Tick
         { title = "Game!"
         , view = view
         , update = update
-        , init = initialModel
+        , init = ( initialModel, Cmd.none )
         }

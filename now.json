@@ -1,3 +1,10 @@
 {
-    "version": 2
+    "version": 2,
+    "name": "Bug",
+    "routes": [
+        {
+            "src": "/",
+            "dest": "main.html"
+        }
+    ]
 }
